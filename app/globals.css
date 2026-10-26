@@ -1,0 +1,417 @@
+/* ==========================================================
+   Swaadha – mobile-friendly overrides
+   Paste at the VERY END of your global stylesheet (globals.css)
+   so these rules win over the desktop rules.
+   ========================================================== */
+
+/* ---------- Global safety ---------- */
+html, body { max-width: 100%; overflow-x: hidden; }
+img, video { max-width: 100%; height: auto; }
+
+/* Touch devices: no hover-only tricks, comfortable tap targets */
+@media (hover: none) {
+  [data-magnetic] { transform: none !important; }
+}
+.sw-btn, .sw-pills button, .sw-hero-arrows button, .sw-hero-bars button {
+  min-height: 44px;
+}
+
+/* ---------- Tablet (<= 900px) ---------- */
+@media (max-width: 900px) {
+  .sw-section { padding: 64px 20px; }
+
+  .sw-head.is-split {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .sw-head-aside { max-width: 100%; }
+
+  .sw-craving-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  .sw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+  .sw-vow-grid { grid-template-columns: 1fr; gap: 16px; }
+
+  /* Story: stack art above copy */
+  .sw-story {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 64px 20px;
+  }
+  .sw-story-art { width: min(320px, 80vw); margin: 0 auto; }
+
+  /* Process: turn the sticky two-column layout into a normal stack */
+  .sw-process {
+    display: block;
+    padding: 64px 20px;
+  }
+  .sw-process-sticky {
+    position: static !important;
+    height: auto !important;
+    margin-bottom: 32px;
+  }
+  .sw-process-rail { display: none; }
+  .sw-process-steps { display: grid; gap: 16px; }
+}
+
+/* ---------- Phone (<= 640px) ---------- */
+@media (max-width: 640px) {
+  .sw-section { padding: 48px 16px; }
+
+  /* Type scale */
+  .sw-head h2, .sw-story-copy h2, .sw-process-sticky h2, .sw-celebrate-copy h2 {
+    font-size: clamp(1.9rem, 8vw, 2.5rem);
+    line-height: 1.12;
+  }
+  .sw-head p, .sw-story-copy p, .sw-celebrate-copy p { font-size: 1rem; line-height: 1.6; }
+
+  /* Hero */
+  .sw-hero {
+    min-height: 100svh;
+    height: auto;
+  }
+  .sw-hero-content {
+    padding: 0 20px;
+    padding-bottom: 150px; /* room for the slider controls */
+  }
+  .sw-hero-title { font-size: clamp(2.2rem, 11vw, 3.2rem); line-height: 1.08; }
+  .sw-hero-content p { font-size: 1rem; max-width: 100%; }
+  .sw-hero-ctas { flex-direction: column; align-items: stretch; gap: 12px; }
+  .sw-hero-ctas .sw-btn { width: 100%; justify-content: center; }
+  .sw-hero-seal, .sw-hero-scroll { display: none; }
+
+  .sw-hero-foot {
+    left: 16px; right: 16px; bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .sw-hero-bars {
+    grid-column: 1 / -1;
+    order: 3;
+    display: flex;
+    gap: 6px;
+  }
+  .sw-hero-bars button { flex: 1; min-height: 28px; }
+  .sw-hero-bars small { display: none; } /* labels too long for phones */
+
+  /* Cravings */
+  .sw-craving-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sw-craving { aspect-ratio: 3 / 4; }
+  .sw-craving-copy b { font-size: 1rem; }
+  .sw-craving-copy small { font-size: .75rem; }
+
+  /* Manifesto */
+  .sw-manifesto { padding: 56px 20px; }
+  .sw-manifesto p, .sw-manifesto [class*="scrub"] { font-size: clamp(1.25rem, 5.6vw, 1.7rem); line-height: 1.4; }
+
+  /* Catalog: horizontal-scrolling pills instead of wrapping */
+  .sw-catalog-tools { flex-direction: column; align-items: stretch; gap: 12px; }
+  .sw-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .sw-pills::-webkit-scrollbar { display: none; }
+  .sw-pills button { flex: 0 0 auto; white-space: nowrap; }
+  .sw-search { width: 100%; }
+  .sw-search input { width: 100%; font-size: 16px; } /* 16px stops iOS zoom on focus */
+
+  /* Category tiles: swipeable row */
+  .sw-cat-showcase {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -16px 20px;
+    padding: 0 16px;
+  }
+  .sw-cat-showcase::-webkit-scrollbar { display: none; }
+  .sw-cat-tile { flex: 0 0 120px; scroll-snap-align: start; }
+
+  /* Product grid */
+  .sw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+  /* Story */
+  .sw-story-copy { text-align: left; }
+  .sw-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 12px;
+  }
+  .sw-stats dt { font-size: clamp(1.8rem, 9vw, 2.4rem); }
+  .sw-story-copy .sw-btn { width: 100%; justify-content: center; }
+
+  /* Vows & process */
+  .sw-vow { padding: 24px 20px; }
+  .sw-process-sticky .sw-btn { width: 100%; justify-content: center; }
+
+  /* Celebrate banner */
+  .sw-celebrate { min-height: 480px; }
+  .sw-celebrate-copy { padding: 32px 20px; }
+  .sw-celebrate-copy .sw-btn { width: 100%; justify-content: center; }
+  .sw-celebrate-media img { transform: none !important; } /* disable parallax */
+}
+
+/* ---------- Very small phones (<= 380px) ---------- */
+@media (max-width: 380px) {
+  .sw-grid { grid-template-columns: 1fr; }
+  .sw-craving-grid { grid-template-columns: 1fr; }
+  .sw-craving { aspect-ratio: 4 / 3; }
+}
+
+/* ---------- Respect reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ==========================================================
+   "A cupboard full of happy things" section + category filter
+   Paste at the VERY END of globals.css
+   ========================================================== */
+
+@media (max-width: 900px) {
+  .sw-favorites .sw-head.is-split {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .sw-favorites .sw-head-aside { max-width: 100%; }
+}
+
+@media (max-width: 640px) {
+  .sw-favorites { padding: 48px 16px; overflow: hidden; }
+
+  .sw-favorites .sw-head h2 {
+    font-size: clamp(1.9rem, 8.5vw, 2.5rem);
+    line-height: 1.12;
+  }
+  .sw-favorites .sw-head-aside p { font-size: 1rem; line-height: 1.55; }
+  .sw-favorites .sw-link { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
+
+  /* ---------- Mobile-friendly filter ---------- */
+  .sw-catalog-tools {
+    display: block;
+    margin-bottom: 18px;
+  }
+
+  /* One swipeable row, edge to edge */
+  .sw-pills {
+    position: relative;               /* needed for the sliding indicator */
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 -16px;                  /* bleed to screen edges */
+    padding: 4px 16px 10px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* soft fade on the right edge = "there's more" hint */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .sw-pills::-webkit-scrollbar { display: none; }
+
+  .sw-pills button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-height: 40px;
+    padding: 0 18px;
+    font-size: .92rem;
+    scroll-snap-align: start;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Sliding gold indicator is unreliable inside a scroller: use a plain
+     active style instead */
+  .sw-pills-indicator { display: none; }
+  .sw-pills button[aria-pressed="true"] {
+    background: var(--gold, #c9962b);
+    color: #3a0d0d;
+    border-color: transparent;
+    font-weight: 600;
+  }
+
+  /* ---------- Product cards: 2-up grid ---------- */
+  .sw-favorites .sw-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .sw-favorites .sw-card h3,
+  .sw-favorites .sw-card-title { font-size: .95rem; line-height: 1.25; }
+  .sw-favorites .sw-card .sw-btn,
+  .sw-favorites .sw-card button { min-height: 40px; font-size: .85rem; }
+}
+
+@media (max-width: 360px) {
+  .sw-favorites .sw-grid { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================
+   Category filter (.sw-filter) – self-contained, desktop + mobile
+   Paste at the VERY END of globals.css
+   Change the 3 colours below to match your brand.
+   ========================================================== */
+.sw-filter {
+  --f-ink: #6b1212;      /* text + border of normal pills */
+  --f-on-bg: #6b1212;    /* selected pill background */
+  --f-on-ink: #f6d37a;   /* selected pill text */
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 24px;
+  padding: 0;
+}
+
+.sw-filter button {
+  appearance: none;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-height: 42px;
+  padding: 0 20px;
+  border: 1.5px solid var(--f-ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--f-ink);
+  font: inherit;
+  font-size: .95rem;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .2s, color .2s;
+}
+
+.sw-filter button.is-on {
+  background: var(--f-on-bg);
+  color: var(--f-on-ink);
+  font-weight: 600;
+}
+
+/* Phones: one swipeable row */
+@media (max-width: 700px) {
+  .sw-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 8px;
+    margin: 0 -16px 18px;
+    padding: 4px 16px 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+  .sw-filter::-webkit-scrollbar { display: none; }
+  .sw-filter button { scroll-snap-align: start; min-height: 40px; padding: 0 16px; font-size: .9rem; }
+}
+
+/* ==========================================================
+   "Our story, served with love" gallery – desktop + mobile
+   Paste at the VERY END of globals.css
+   Scoped to .sw-gallery-grid so the homepage cravings are untouched.
+   ========================================================== */
+
+.sw-gallery { padding-left: 20px; padding-right: 20px; }
+
+.sw-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sw-gallery-grid .sw-craving {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+/* Image fills the whole card */
+.sw-gallery-grid .sw-craving-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  z-index: -2;
+}
+.sw-gallery-grid .sw-craving-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Dark gradient so the text is readable */
+.sw-gallery-grid .sw-craving::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(40, 8, 8, .8) 0%, rgba(40, 8, 8, 0) 60%);
+}
+
+/* Text at the bottom */
+.sw-gallery-grid .sw-craving-copy {
+  position: absolute;
+  left: 20px;
+  right: 64px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+.sw-gallery-grid .sw-craving-copy small { font-size: .8rem; opacity: .85; }
+.sw-gallery-grid .sw-craving-copy b { font-size: 1.25rem; line-height: 1.2; font-weight: 600; }
+
+/* Arrow button bottom-right */
+.sw-gallery-grid .sw-craving-arrow {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f6d37a;
+  color: #6b1212;
+}
+
+/* Tablet: 2 columns, third card spans */
+@media (max-width: 900px) {
+  .sw-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .sw-gallery-grid .sw-craving:last-child { grid-column: 1 / -1; aspect-ratio: 16 / 10; }
+}
+
+/* Phone: single column, full width, centred */
+@media (max-width: 560px) {
+  .sw-gallery { padding-left: 16px; padding-right: 16px; }
+  .sw-gallery-grid { grid-template-columns: 1fr; gap: 14px; }
+  .sw-gallery-grid .sw-craving,
+  .sw-gallery-grid .sw-craving:last-child { aspect-ratio: 4 / 5; border-radius: 16px; }
+  .sw-gallery-grid .sw-craving-copy b { font-size: 1.15rem; }
+}

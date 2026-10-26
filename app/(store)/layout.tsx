@@ -4,7 +4,7 @@ import { display, body, header } from '../fonts';
 import { AuthProvider } from '@/components/auth-dialog';
 import { CommerceProvider } from '@/components/commerce';
 import { SiteShell } from '@/components/site-shell';
-
+   import '@/app/globals.css';
 export const metadata: Metadata = {
   title: { default: 'Swaadha — Taste That Feels Like Home', template: '%s | Swaadha' },
   description:

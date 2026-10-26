@@ -16,6 +16,7 @@ export function Catalog({ featured = false }: { featured?: boolean }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const pills = useRef<HTMLDivElement>(null);
+  const tiles = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const selected = new URLSearchParams(window.location.search).get('category');
@@ -39,19 +40,13 @@ export function Catalog({ featured = false }: { featured?: boolean }) {
     };
   }, []);
 
-  // Slide the gold indicator under whichever pill is selected.
+  // Keep the selected filter in view (works for pills on home, tiles on products page).
   useLayoutEffect(() => {
-    const wrap = pills.current;
+    const wrap = featured ? pills.current : tiles.current;
     const el = wrap?.querySelector<HTMLElement>('[aria-pressed="true"]');
     if (!wrap || !el) return;
-    const place = () => {
-      wrap.style.setProperty('--pill-x', `${el.offsetLeft}px`);
-      wrap.style.setProperty('--pill-w', `${el.offsetWidth}px`);
-    };
-    place();
-    window.addEventListener('resize', place);
-    return () => window.removeEventListener('resize', place);
-  }, [category, categories]);
+    wrap.scrollTo({ left: el.offsetLeft - 16, behavior: 'smooth' });
+  }, [category, categories, featured]);
 
   const names = [ALL, ...categories.map((c) => c.name)];
   const filtered = products.filter(
@@ -63,40 +58,43 @@ export function Catalog({ featured = false }: { featured?: boolean }) {
 
   return (
     <div className="sw-catalog">
+      {/* PRODUCTS PAGE: one filter only = the category tiles on top */}
       {!featured && categories.length > 0 && (
-        <div className="sw-cat-showcase" role="navigation" aria-label="Browse categories" data-stagger>
-          {[{ id: 'all', name: ALL, image: '/images/hero.webp' } as Category, ...categories].map((c) => {
-            const count = c.name === ALL ? products.length : products.filter((p) => p.category === c.name).length;
-            return (
-              <button
-                key={c.id}
-                type="button"
-                data-reveal="up"
-                className={`sw-cat-tile ${category === c.name ? 'is-active' : ''}`}
-                onClick={() => setCategory(c.name)}
-              >
-                <span className="sw-cat-tile-img">
-                  <img src={c.name === ALL ? '/images/hero.webp' : getCategoryImage(c)} alt="" />
-                </span>
-                <span className="sw-cat-tile-name">{c.name}</span>
-                <span className="sw-cat-tile-count">
-                  {count} {count === 1 ? 'product' : 'products'}
-                </span>
-              </button>
-            );
-          })}
+        <div className="sw-cat-showcase" ref={tiles} role="group" aria-label="Browse categories">
+{[{ id: 'all', name: ALL, image: '/images/hero.webp' } as Category, ...categories].map((c) => (
+  <button
+    key={c.id}
+    type="button"
+    aria-pressed={category === c.name}
+    className={`sw-cat-tile ${category === c.name ? 'is-active' : ''}`}
+    onClick={() => setCategory(c.name)}
+  >
+    <span className="sw-cat-tile-img">
+      <img src={c.name === ALL ? '/images/hero.webp' : getCategoryImage(c)} alt="" />
+    </span>
+    <span className="sw-cat-tile-name">{c.name}</span>
+  </button>
+))}
         </div>
       )}
 
+      {/* HOME PAGE (featured): pills only. PRODUCTS PAGE: search only. */}
       <div className={`sw-catalog-tools ${featured ? 'is-featured' : ''}`}>
-        <div className="sw-pills" ref={pills} role="group" aria-label="Filter by category">
-          <span className="sw-pills-indicator" aria-hidden="true" />
-          {names.map((c) => (
-            <button key={c} aria-pressed={c === category} onClick={() => setCategory(c)}>
-              {c}
-            </button>
-          ))}
-        </div>
+        {featured && (
+          <div className="sw-filter" ref={pills} role="group" aria-label="Filter by category">
+            {names.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className={c === category ? 'is-on' : ''}
+                aria-pressed={c === category}
+                onClick={() => setCategory(c)}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        )}
         {!featured && (
           <label className="sw-search">
             <Search size={16} />
@@ -116,7 +114,8 @@ export function Catalog({ featured = false }: { featured?: boolean }) {
         </p>
       )}
 
-      <div className="sw-grid" key={`${category}-${loading}`} data-stagger>
+      {/* No data-stagger here: re-mounted items would never get revealed and would vanish */}
+      <div className="sw-grid" key={`${category}-${loading}`}>
         {loading
           ? Array.from({ length: 4 }, (_, i) => (
               <div className="sw-card-skeleton" key={i} aria-hidden="true">
