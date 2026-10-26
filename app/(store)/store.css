@@ -544,10 +544,14 @@ html.intro .sw-intro {
   position: fixed;
   inset: 0;
   z-index: 200;
+  /* The class stays on <html> until the first navigation, so the empty wrapper must let clicks
+     through once its panels have slid away; the panels block clicks only while they are visible. */
+  pointer-events: none;
 }
 .sw-intro-panel {
   position: absolute;
   inset: 0;
+  pointer-events: auto;
   animation: intro-up 1.05s var(--ease-io) forwards;
 }
 .sw-intro-panel.is-ivory {
@@ -4432,9 +4436,10 @@ a.sw-contact-card:hover {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--gold-grad);
-  color: var(--red-900);
-  box-shadow: 0 18px 40px -14px rgba(58, 7, 9, 0.7);
+  /* WhatsApp's own brand green, so visitors recognise it at a glance. */
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 18px 40px -14px rgba(7, 94, 84, 0.7);
   transition: transform 0.5s var(--ease-back);
 }
 .sw-whatsapp::before {
@@ -4442,7 +4447,15 @@ a.sw-contact-card:hover {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  animation: ring 2.6s ease infinite;
+  animation: wa-ring 2.6s ease infinite;
+}
+@keyframes wa-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 34px rgba(37, 211, 102, 0);
+  }
 }
 .sw-whatsapp:hover {
   transform: scale(1.1) rotate(-8deg);
