@@ -2038,52 +2038,115 @@ button.status:hover:not(:disabled) {
   justify-self: start;
 }
 
-/* Barcode modal */
-.barcode-sticker-card {
-  padding: 20px;
-  border-radius: 18px;
-  background: var(--white);
-  border: 1.5px dashed var(--gold-500);
+/* Barcode modal: label preview drawn with the same layout as the printed PDF */
+.label-preview {
+  position: relative;
+  container-type: size;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font-family: Helvetica, Arial, sans-serif;
+  box-shadow: 0 0 0 1px var(--line), 0 14px 30px -18px rgba(0, 0, 0, 0.45);
+}
+.label-line {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  overflow: hidden;
+  line-height: 1;
   text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transform: translateY(-0.14em);
 }
-.sticker-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.sticker-brand {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: var(--red);
-}
-.sticker-category {
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: var(--gold-50);
-  color: var(--gold-700);
-  font-size: 11px;
+.label-bold {
   font-weight: 700;
 }
-.sticker-title {
-  font-size: 26px;
+.label-code {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.25em;
 }
-.sticker-weight {
-  margin: 4px 0 14px;
-  font-size: 12.5px;
-  color: var(--ink-mute);
+.label-bars {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
-.sticker-barcode-wrap {
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--ivory);
+.label-rule {
+  position: absolute;
+  border-top: 1px dashed #444;
 }
-.sticker-footer {
+.label-foot {
+  position: absolute;
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 4%;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-0.14em);
+}
+.label-foot span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #383838;
+}
+.label-code-row {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 14px;
+}
+.label-code-row small {
+  color: var(--ink-mute);
+  font-size: 12px;
+}
+.label-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-top: 16px;
+}
+.label-options > label {
+  display: grid;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.label-quick-counts {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.label-quick-counts button {
+  height: 34px;
+  min-width: 56px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 600;
+}
+.label-quick-counts button.selected {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--on-dark);
+}
+@media (max-width: 520px) {
+  .label-options {
+    grid-template-columns: 1fr;
+  }
 }
 .sticker-code-pill {
   display: inline-flex;
@@ -2091,15 +2154,10 @@ button.status:hover:not(:disabled) {
   gap: 8px;
   padding: 6px 12px;
   border-radius: 999px;
+  border: 0;
   background: var(--cream);
   color: var(--red-900);
   cursor: pointer;
-}
-.sticker-price {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 26px;
-  color: var(--red);
 }
 .barcode-instructions {
   margin-top: 12px;

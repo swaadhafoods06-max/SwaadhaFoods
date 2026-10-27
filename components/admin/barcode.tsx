@@ -1,24 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Download, Printer, X, Copy, Check } from 'lucide-react';
-import { money } from '@/lib/admin';
+import { Check, Copy, Download, Printer, X } from 'lucide-react';
 import { MAX_LABEL_CODE_LENGTH, skuBarcode, type Product } from '@/lib/products';
-
-// Standard Code 39 Encoding Table (9 elements: 5 bars, 4 spaces, exactly 3 wide)
-const CODE39: Record<string, string> = {
-  '0': 'NNNWWNWNN', '1': 'WNNWNNNNW', '2': 'NNWWNNNNW', '3': 'WNWWNNNNN',
-  '4': 'NNNWWNNNW', '5': 'WNNWWNNNN', '6': 'NNWWWNNNN', '7': 'NNNWNNWNW',
-  '8': 'WNNWNNWNN', '9': 'NNWWNNWNN', 'A': 'WNNNNWNNW', 'B': 'NNWNNWNNW',
-  'C': 'WNWNNWNNN', 'D': 'NNNNWWNNW', 'E': 'WNNNWWNNN', 'F': 'NNWNWWNNN',
-  'G': 'NNNNNWWNW', 'H': 'WNNNNWWNN', 'I': 'NNWNNWWNN', 'J': 'NNNNWWWNN',
-  'K': 'WNNNNNNWW', 'L': 'NNWNNNNWW', 'M': 'WNWNNNNWN', 'N': 'NNNNWNNWW',
-  'O': 'WNNNWNNWN', 'P': 'NNWNWNNWN', 'Q': 'NNNNNNWWW', 'R': 'WNNNNNWWN',
-  'S': 'NNWNNNWWN', 'T': 'NNNNWNWWN', 'U': 'WWNNNNNNW', 'V': 'NWWNNNNNW',
-  'W': 'WWWNNNNNN', 'X': 'NWNNWNNNW', 'Y': 'WWNNWNNNN', 'Z': 'NWWNWNNNN',
-  '-': 'NWNNNNWNW', '.': 'WWNNNNNWN', ' ': 'NWWNNNWNN', '*': 'NWNNWNWNN',
-  '$': 'NWNWNWNNN', '/': 'NWNWNNNWN', '+': 'NWNNNWNWN', '%': 'NNNWNWNWN'
-};
+import {
+  code39Bars,
+  LABEL_BRAND,
+  LABEL_LAYOUT,
+  LABEL_SIZES,
+  labelPdf,
+  labelPrice,
+  labelWeight,
+  type LabelSize,
+} from '@/lib/labels';
 
 export function cleanBarcodeValue(val: string): string {
   const cleaned = val.toUpperCase().replace(/[^0-9A-Z\-.$/+% ]/g, '');
@@ -55,88 +49,59 @@ export function generateBarcodeValue(sku?: string, taken: Iterable<string> = [])
   return code;
 }
 
-interface BarcodeSvgProps {
-  value: string;
-  height?: number;
-  barWidth?: number;
-  showText?: boolean;
-  className?: string;
-}
-
-export function BarcodeSvg({
-  value,
-  height = 54,
-  barWidth = 1.8,
-  showText = true,
-  className = '',
-}: BarcodeSvgProps) {
-  const clean = cleanBarcodeValue(value);
-  const fullText = `*${clean}*`;
-
-  const wideRatio = 2.6;
-  const narrowWidth = barWidth;
-  const wideWidth = barWidth * wideRatio;
-  const gapWidth = narrowWidth;
-
-  const rects: { x: number; width: number; isBar: boolean }[] = [];
-  let currentX = narrowWidth * 10; // quiet zone (Code 39 minimum is 10 narrow widths)
-
-  for (let i = 0; i < fullText.length; i++) {
-    const ch = fullText[i];
-    const pattern = CODE39[ch] || CODE39['-'];
-
-    for (let p = 0; p < 9; p++) {
-      const isBar = p % 2 === 0;
-      const isWide = pattern[p] === 'W';
-      const w = isWide ? wideWidth : narrowWidth;
-
-      if (isBar) {
-        rects.push({ x: currentX, width: w, isBar: true });
-      }
-      currentX += w;
-    }
-    // Inter-character space
-    currentX += gapWidth;
-  }
-
-  currentX += narrowWidth * 10; // trailing quiet zone
-  const totalWidth = Math.ceil(currentX);
-  const totalHeight = height + (showText ? 18 : 0);
-
+/** Code 39 bars only (no text), stretched to fill whatever box it's placed in. */
+export function BarcodeSvg({ value, className = '', style }: { value: string; className?: string; style?: React.CSSProperties }) {
+  const { bars, width } = code39Bars(cleanBarcodeValue(value));
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox={`0 0 ${totalWidth} ${totalHeight}`}
-      width={totalWidth}
-      height={totalHeight}
+      viewBox={`0 0 ${width} 10`}
+      preserveAspectRatio="none"
       className={className}
-      style={{ display: 'block', margin: '0 auto', background: '#ffffff', borderRadius: 4 }}
+      style={style}
+      role="img"
+      aria-label={`Barcode ${value}`}
     >
-      {rects.map((r, idx) => (
-        <rect
-          key={idx}
-          x={r.x}
-          y={4}
-          width={r.width}
-          height={height}
-          fill="#111111"
-        />
+      {bars.map((b, i) => (
+        <rect key={i} x={b.x} y={0} width={b.width} height={10} fill="#111" />
       ))}
-      {showText && (
-        <text
-          x={totalWidth / 2}
-          y={height + 16}
-          textAnchor="middle"
-          fill="#333333"
-          fontSize="11"
-          fontFamily="monospace"
-          fontWeight="600"
-          letterSpacing="2"
-        >
-          {clean}
-        </text>
-      )}
     </svg>
+  );
+}
+
+/** Copies chosen with one tap; any other number can be typed. */
+const QUICK_COUNTS = [1, 10, 50, 100];
+
+/** On-screen copy of the printed label, placed with the same layout numbers as the PDF. */
+function LabelPreview({ product, code, size }: { product: Product; code: string; size: LabelSize }) {
+  const L = LABEL_LAYOUT;
+  const units = code39Bars(code).width;
+  // The PDF caps narrow bars at 0.35 mm; the same cap as a share of the label width.
+  const barsWidth = Math.min(L.barsMaxWidth, (units * 0.35) / size.width);
+  const at = (top: number, fontSize?: number) =>
+    ({ top: `${top * 100}%`, ...(fontSize && { fontSize: `${fontSize * 100}cqh` }) }) as React.CSSProperties;
+  return (
+    <div className="label-preview" style={{ aspectRatio: `${size.width} / ${size.height}`, padding: `0 ${L.side * 100}%` }}>
+      <div className="label-line label-bold" style={at(L.brand.top, L.brand.size)}>
+        {LABEL_BRAND}
+      </div>
+      <div className="label-line label-bold" style={at(L.name.top, L.name.size)}>
+        {product.name.toUpperCase()}
+      </div>
+      <BarcodeSvg
+        value={code}
+        className="label-bars"
+        style={{ top: `${L.bars.top * 100}%`, height: `${(L.bars.bottom - L.bars.top) * 100}%`, width: `${barsWidth * 100}%` }}
+      />
+      <div className="label-line label-code" style={at(L.code.top, L.code.size)}>
+        {code}
+      </div>
+      <div className="label-rule" style={{ top: `${L.rule * 100}%`, left: `${L.side * 100}%`, right: `${L.side * 100}%` }} />
+      <div className="label-foot" style={{ ...at(L.foot.top, L.foot.size), left: `${L.side * 100}%`, right: `${L.side * 100}%` }}>
+        <span>{labelWeight(product.weight)}</span>
+        <b>MRP: ₹{labelPrice(product.price)}</b>
+      </div>
+    </div>
   );
 }
 
@@ -147,68 +112,59 @@ interface BarcodeModalProps {
 
 export function BarcodeModal({ product, onClose }: BarcodeModalProps) {
   const [copied, setCopied] = React.useState(false);
-  const barcodeVal = productBarcode(product);
+  const [sizeId, setSizeId] = React.useState<string>(LABEL_SIZES[0].id);
+  const [count, setCount] = React.useState(1);
+  const [working, setWorking] = React.useState(false);
+  const [problem, setProblem] = React.useState('');
+  const code = productBarcode(product);
+  const size = LABEL_SIZES.find((s) => s.id === sizeId) ?? LABEL_SIZES[0];
+  const copies = Math.max(1, Math.min(1000, Math.floor(count) || 1));
+  const fileName = `labels-${code}-${copies}x-${size.id}.pdf`;
 
   function copyCode() {
-    navigator.clipboard.writeText(barcodeVal);
+    navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function handlePrint() {
-    const printWindow = window.open('', '_blank', 'width=500,height=400');
-    if (!printWindow) return;
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Barcode - ${product.name}</title>
-        <style>
-          @page { size: 60mm 40mm; margin: 3mm; }
-          body {
-            font-family: 'DM Sans', -apple-system, Arial, sans-serif;
-            margin: 0;
-            padding: 4mm;
-            text-align: center;
-            background: #fff;
-            color: #111;
-          }
-          .brand { font-size: 8px; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; color: #c8202a; margin-bottom: 2px; }
-          .name { font-size: 11px; font-weight: 700; line-height: 1.2; margin: 2px 0; max-height: 24px; overflow: hidden; }
-          .meta { font-size: 9px; color: #555; margin-bottom: 4px; }
-          .price { font-size: 13px; font-weight: 800; color: #c8202a; margin-top: 2px; }
-          .barcode-container { margin: 4px auto; }
-          svg { max-width: 100%; height: auto; }
-        </style>
-      </head>
-      <body>
-        <div class="brand">SWAADHA KITCHEN</div>
-        <div class="name">${product.name}</div>
-        <div class="meta">${product.category} · ${product.weight}</div>
-        <div class="barcode-container">
-          ${document.getElementById('barcode-render-box')?.innerHTML || ''}
-        </div>
-        <div class="price">MRP ${money(product.price)}</div>
-        <script>
-          window.onload = function() { window.print(); window.close(); }
-        </script>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
+  async function makePdf() {
+    const bytes = await labelPdf({ name: product.name, weight: product.weight, price: product.price, code }, size, copies);
+    return URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/pdf' }));
   }
 
-  function downloadSvg() {
-    const svgEl = document.querySelector('#barcode-render-box svg');
-    if (!svgEl) return;
-    const svgData = new XMLSerializer().serializeToString(svgEl);
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const link = document.createElement('a');
-    link.href = svgUrl;
-    link.download = `barcode-${product.sku || product.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
-    link.click();
-    URL.revokeObjectURL(svgUrl);
+  async function download() {
+    setWorking(true);
+    setProblem('');
+    try {
+      const url = await makePdf();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch {
+      setProblem('The labels could not be made. Please try again.');
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function print() {
+    // Opened straight away, while the click still counts, so the browser doesn't block it as a popup.
+    const tab = window.open('', '_blank');
+    setWorking(true);
+    setProblem('');
+    try {
+      const url = await makePdf();
+      if (tab) tab.location.href = url;
+      else window.location.href = url;
+      setTimeout(() => URL.revokeObjectURL(url), 10 * 60_000);
+    } catch {
+      tab?.close();
+      setProblem('The labels could not be made. Please try again.');
+    } finally {
+      setWorking(false);
+    }
   }
 
   return (
@@ -216,51 +172,76 @@ export function BarcodeModal({ product, onClose }: BarcodeModalProps) {
       <section
         className="product-modal barcode-modal"
         role="dialog"
-        aria-label="Product Barcode Label"
+        aria-label="Product barcode labels"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: 460 }}
+        style={{ maxWidth: 520 }}
       >
         <div className="modal-heading">
-          <h2>Product Barcode</h2>
+          <h2>Barcode labels</h2>
           <button type="button" aria-label="Close dialog" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
 
-        <div className="barcode-sticker-card">
-          <div className="sticker-header">
-            <span className="sticker-brand">THE SWAADHA KITCHEN</span>
-            <span className="sticker-category">{product.category}</span>
-          </div>
+        <LabelPreview product={product} code={code} size={size} />
 
-          <h3 className="sticker-title">{product.name}</h3>
-          <p className="sticker-weight">Net Wt: {product.weight} {product.sku ? `· SKU: ${product.sku}` : ''}</p>
+        <div className="label-code-row">
+          <button type="button" className="sticker-code-pill" onClick={copyCode} title="Copy barcode value">
+            <code>{code}</code>
+            {copied ? <Check size={12} color="#b8872c" /> : <Copy size={12} />}
+          </button>
+          <small>Each label is one page, cut to the sticker size.</small>
+        </div>
 
-          <div id="barcode-render-box" className="sticker-barcode-wrap">
-            <BarcodeSvg value={barcodeVal} height={56} barWidth={1.8} />
-          </div>
-
-          <div className="sticker-footer">
-            <div className="sticker-code-pill" onClick={copyCode} title="Click to copy barcode value">
-              <code>{barcodeVal}</code>
-              {copied ? <Check size={12} color="#b8872c" /> : <Copy size={12} />}
-            </div>
-            <strong className="sticker-price">{money(product.price)}</strong>
+        <div className="label-options">
+          <label>
+            Sticker size
+            <select value={sizeId} onChange={(e) => setSizeId(e.target.value)}>
+              {LABEL_SIZES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Number of labels
+            <input
+              type="number"
+              min={1}
+              max={1000}
+              step={1}
+              inputMode="numeric"
+              value={count || ''}
+              onChange={(e) => setCount(Number(e.target.value))}
+            />
+          </label>
+          <div className="label-quick-counts" role="group" aria-label="Quick label counts">
+            {QUICK_COUNTS.map((n) => (
+              <button key={n} type="button" className={copies === n ? 'selected' : ''} onClick={() => setCount(n)}>
+                {n}
+              </button>
+            ))}
           </div>
         </div>
 
+        {problem && (
+          <p className="error" role="alert">
+            {problem}
+          </p>
+        )}
+
+        <div className="modal-actions" style={{ justifyContent: 'space-between', marginTop: 16 }}>
+          <button type="button" className="button outline" onClick={download} disabled={working} style={{ gap: 8 }}>
+            <Download size={15} /> Download PDF ({copies})
+          </button>
+          <button type="button" className="button" onClick={print} disabled={working} style={{ gap: 8 }}>
+            <Printer size={15} /> {working ? 'Preparing…' : `Print ${copies} label${copies === 1 ? '' : 's'}`}
+          </button>
+        </div>
         <p className="barcode-instructions">
-          Scannable with any standard 1D laser or optical barcode scanner at POS checkout.
+          When printing, pick your label printer and set scale to 100% / Actual size so each sticker is filled exactly.
         </p>
-
-        <div className="modal-actions" style={{ justifyContent: 'space-between', marginTop: 20 }}>
-          <button type="button" className="button outline" onClick={downloadSvg} style={{ gap: 8 }}>
-            <Download size={15} /> Download SVG
-          </button>
-          <button type="button" className="button" onClick={handlePrint} style={{ gap: 8 }}>
-            <Printer size={15} /> Print Label Sticker
-          </button>
-        </div>
       </section>
     </div>
   );

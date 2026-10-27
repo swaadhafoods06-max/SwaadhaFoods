@@ -81,10 +81,10 @@ export default function PosPage() {
                 onClose={() => setCameraOpen(false)}
                 isKnown={(code) => !!productForCode(code)}
                 onScan={(code) => {
-                  const product = addScannedToPosCart(code);
-                  return product
+                  const { product, error } = addScannedToPosCart(code);
+                  return product && !error
                     ? { ok: true, message: `Added ${product.name}`, item: product.name }
-                    : { ok: false, message: `No product for ${code}` };
+                    : { ok: false, message: error || `No product for ${code}` };
                 }}
               />
             )}

@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase';
 import { Product } from '@/lib/products';
 import { Order } from '@/lib/admin';
 import { cleanBarcodeValue, legacyProductBarcode, productBarcode } from '../barcode';
-import { today } from '../config';
 import type { AdminData } from './use-admin-data';
 
 type BillLine = { product: Product; quantity: number };
@@ -30,7 +29,21 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
     return () => clearTimeout(fade);
   }, [posLastAdded]);
 
+  /** Packs of a product still free to add to the bill: latest stock minus what's already in it. */
+  function stockLeft(productId: string) {
+    const stock = products.find((p) => p.id === productId)?.stock ?? 0;
+    return stock - (posCart.find((item) => item.product.id === productId)?.quantity ?? 0);
+  }
+
+  const stockMessage = (p: Product) =>
+    (p.stock ?? 0) > 0 ? `Only ${p.stock} of ${p.name} in stock, all already in the bill.` : `${p.name} is out of stock.`;
+
+  /** Adds one pack to the bill. Returns false (and shows why) when there's no stock left for it. */
   function addToPosCart(p: Product) {
+    if (stockLeft(p.id) < 1) {
+      setError(stockMessage(products.find((x) => x.id === p.id) ?? p));
+      return false;
+    }
     setPosLastAdded({ id: p.id, at: Date.now() });
     setPosCart((prev) => {
       const existing = prev.find((item) => item.product.id === p.id);
@@ -39,9 +52,15 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
       }
       return [...prev, { product: p, quantity: 1 }];
     });
+    return true;
   }
 
   function updatePosQty(productId: string, delta: number) {
+    if (delta > 0 && stockLeft(productId) < delta) {
+      const p = products.find((x) => x.id === productId);
+      if (p) setError(stockMessage(p));
+      return;
+    }
     setPosCart((prev) =>
       prev
         .map((item) => {
@@ -70,26 +89,26 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
 
   /**
    * Finds the product for a scanned code or typed text and adds it to the bill. Exact codes win
-   * over name matches, so a scan never lands on the wrong product. Returns the product, if any.
+   * over name matches, so a scan never lands on the wrong product. `error` says why nothing was added.
    */
-  function addScannedToPosCart(text: string): Product | undefined {
+  function addScannedToPosCart(text: string): { product?: Product; error?: string } {
     const typed = text.trim();
-    if (!typed) return;
+    if (!typed) return {};
     const term = typed.toLowerCase();
     const found =
       productForCode(typed) ??
       products.find((p) => p.name.toLowerCase() === term) ??
       products.find((p) => p.name.toLowerCase().includes(term));
-    if (found) {
-      addToPosCart(found);
-      setPosSearch('');
-      setError('');
-      setNotice(`Added "${found.name}" to bill.`);
-    } else {
+    if (!found) {
       setPosSearch(typed);
       setError(`No product matches "${typed}". Check the label or search by name.`);
+      return { error: `No product for ${typed}` };
     }
-    return found;
+    if (!addToPosCart(found)) return { product: found, error: stockMessage(found) };
+    setPosSearch('');
+    setError('');
+    setNotice(`Added "${found.name}" to bill.`);
+    return { product: found };
   }
 
   // A USB/Bluetooth barcode scanner types the code and presses Enter.
@@ -112,34 +131,20 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
       return;
     }
     run(async () => {
-      const orderNumber = `POS-${Date.now().toString().slice(-6)}`;
-      const newOrderPayload = {
-        customer_name: posCustomerName.trim() || 'Counter Customer',
-        phone: posCustomerPhone.trim() || '9999999999',
-        address: 'Kitchen Counter / In-Store POS',
-        requested_date: today(),
-        status: 'delivered',
-        payment_method: `POS (${posPaymentMethod})`,
-        payment_status: 'paid',
-        total: posGrandTotal,
-        discount: posDiscount,
-        invoice_number: orderNumber,
-        items: posCart.map((item) => ({
-          product_id: item.product.id,
-          name: item.product.name,
-          weight: item.product.weight,
-          price: item.product.price,
-          quantity: item.quantity,
-        })),
-      };
-
-      const res = await supabase!.from('orders').insert(newOrderPayload).select().single();
-      if (res.error) throw res.error;
-
-      // Update product inventory stock
-      for (const item of posCart) {
-        const nextStock = Math.max(0, (item.product.stock ?? 0) - item.quantity);
-        await supabase!.from('products').update({ stock: nextStock }).eq('id', item.product.id);
+      // One database step records the sale and takes the stock, or does neither (e.g. not enough stock).
+      const res = await supabase!.rpc('record_pos_sale', {
+        p_customer_name: posCustomerName,
+        p_phone: posCustomerPhone,
+        p_payment_method: posPaymentMethod,
+        p_discount: posDiscount,
+        p_items: posCart.map((item) => ({ product_id: item.product.id, quantity: item.quantity })),
+      });
+      if (res.error) {
+        throw new Error(
+          /record_pos_sale/.test(res.error.message)
+            ? 'POS sales need a database update. Run supabase/007-pos-sale-stock.sql in the Supabase SQL editor.'
+            : res.error.message
+        );
       }
 
       setPosReceiptOrder(res.data as Order);
