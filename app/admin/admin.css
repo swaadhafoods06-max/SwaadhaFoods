@@ -2365,7 +2365,7 @@ button.status:hover:not(:disabled) {
   inset: 32% 10%;
   border: 2px solid var(--gold-500);
   border-radius: 10px;
-  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.55);
 }
 .camera-guide::after {
   content: '';

@@ -32,6 +32,8 @@ export function CameraScanner({
   // twice in development) never touches the live one.
   const slot = useRef<HTMLDivElement>(null);
   const photo = useRef<HTMLInputElement>(null);
+  // Only the part of the picture inside this box is read, so codes elsewhere in view are ignored.
+  const guide = useRef<HTMLDivElement>(null);
   const handle = useRef({ onScan, isKnown });
   handle.current = { onScan, isKnown };
   // Camera list and the one in use are refs, so finding them doesn't restart the camera.
@@ -75,6 +77,7 @@ export function CameraScanner({
     const read = { code: '', count: 0 };
     const handled = { code: '', at: 0 };
     const showStats = setInterval(() => setShownStats({ ...stats.current }), 500);
+    const boxed = document.createElement('canvas');
 
     function decoded(code: string) {
       if (cancelled || !code) return;
@@ -98,7 +101,7 @@ export function CameraScanner({
       if (video.readyState >= 2 && reader.current) {
         stats.current.frames++;
         stats.current.size = `${video.videoWidth}×${video.videoHeight}`;
-        decoded(await reader.current.read(video));
+        if (guide.current && cropToGuide(video, guide.current, boxed)) decoded(await reader.current.read(boxed));
       }
       if (!cancelled) timer = setTimeout(loop, FRAME_DELAY_MS);
     }
@@ -187,7 +190,7 @@ export function CameraScanner({
       <div className="camera-scanner">
         <div className="camera-view">
           <div ref={slot} className="camera-slot" />
-          {!problem && <div className="camera-guide" aria-hidden="true" />}
+          {!problem && <div ref={guide} className="camera-guide" aria-hidden="true" />}
           {starting && !problem && <p className="camera-overlay">Starting camera…</p>}
           {problem && (
             <p className="camera-overlay problem" role="alert">
@@ -203,7 +206,7 @@ export function CameraScanner({
               {last.ok ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />} {last.message}
             </>
           ) : (
-            'Hold the label inside the box, filling it, about 10–20 cm away. Each scan is added to the bill.'
+            'Only the code inside the box is read. Fill the box with the label, about 10–20 cm away.'
           )}
         </p>
         {added.length > 0 && (
@@ -308,6 +311,37 @@ async function createReader(): Promise<Reader> {
       }
     },
   };
+}
+
+/** Extra room read around the box on each side, as a share of its size, so the white margin a barcode needs isn't cut off. */
+const GUIDE_MARGIN = 0.08;
+
+/**
+ * Copies the part of the video frame that's inside the on-screen box onto `canvas`. The video is
+ * shown with object-fit: cover, so the box is mapped back from screen to camera pixels.
+ * Returns false when there's no picture yet.
+ */
+function cropToGuide(video: HTMLVideoElement, box: HTMLElement, canvas: HTMLCanvasElement) {
+  const { videoWidth, videoHeight } = video;
+  const view = video.getBoundingClientRect();
+  const area = box.getBoundingClientRect();
+  if (!videoWidth || !view.width || !area.width) return false;
+  const scale = Math.max(view.width / videoWidth, view.height / videoHeight);
+  const offsetX = (view.width - videoWidth * scale) / 2;
+  const offsetY = (view.height - videoHeight * scale) / 2;
+  const padX = area.width * GUIDE_MARGIN;
+  const padY = area.height * GUIDE_MARGIN;
+  const left = Math.max(0, (area.left - padX - view.left - offsetX) / scale);
+  const top = Math.max(0, (area.top - padY - view.top - offsetY) / scale);
+  const right = Math.min(videoWidth, (area.right + padX - view.left - offsetX) / scale);
+  const bottom = Math.min(videoHeight, (area.bottom + padY - view.top - offsetY) / scale);
+  const width = Math.round(right - left);
+  const height = Math.round(bottom - top);
+  if (width < 10 || height < 10) return false;
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext('2d', { willReadFrequently: true })!.drawImage(video, left, top, width, height, 0, 0, width, height);
+  return true;
 }
 
 /** Reads a barcode from a photo, trying it level and turned a quarter, since phone photos are often sideways. */
