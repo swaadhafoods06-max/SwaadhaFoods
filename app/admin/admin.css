@@ -2436,3 +2436,121 @@ button.status:hover:not(:disabled) {
     inset: 38% 8%;
   }
 }
+.camera-photo {
+  position: relative;
+  cursor: pointer;
+}
+.camera-photo input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.camera-stats {
+  color: var(--ink-mute);
+  font-size: 11px;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* POS: show what was just added */
+.pos-bill-item.just-added {
+  animation: rise 0.35s var(--ease), bill-flash 3s ease-out;
+}
+@keyframes bill-flash {
+  0%,
+  35% {
+    background: var(--gold-200);
+    box-shadow: inset 4px 0 0 var(--red);
+  }
+  100% {
+    background: transparent;
+    box-shadow: inset 4px 0 0 transparent;
+  }
+}
+.pos-bill-item.just-added .pos-item-qty span {
+  animation: qty-pop 0.45s var(--ease);
+}
+@keyframes qty-pop {
+  50% {
+    transform: scale(1.6);
+    color: var(--red);
+  }
+}
+.pos-card.just-added {
+  animation: card-flash 1.6s ease-out;
+}
+@keyframes card-flash {
+  0% {
+    border-color: var(--red);
+    box-shadow: 0 0 0 4px rgba(200, 32, 42, 0.25);
+  }
+  100% {
+    border-color: var(--line-soft);
+    box-shadow: none;
+  }
+}
+.pos-added-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--red-900);
+  color: var(--on-dark);
+  font-size: 14px;
+  box-shadow: 0 16px 34px -14px rgba(0, 0, 0, 0.55);
+  transform: translateX(-50%);
+  animation: toast-in 0.3s var(--ease);
+}
+.pos-added-toast span:first-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pos-added-toast svg {
+  flex: none;
+  color: var(--gold-300);
+}
+.pos-added-total {
+  flex: none;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  font-weight: 700;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+}
+.camera-status {
+  animation: rise 0.3s var(--ease);
+}
+.camera-added {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+}
+.camera-added b {
+  margin-right: 4px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+}
+.camera-added span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--gold-50);
+  border: 1px solid var(--gold-300);
+  font-weight: 600;
+}

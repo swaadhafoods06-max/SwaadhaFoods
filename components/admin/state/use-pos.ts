@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Product } from '@/lib/products';
 import { Order } from '@/lib/admin';
@@ -21,8 +21,17 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
   const [posCashTendered, setPosCashTendered] = useState('');
   const [posDiscount, setPosDiscount] = useState<number>(0);
   const [posReceiptOrder, setPosReceiptOrder] = useState<Order | null>(null);
+  // The product added most recently, so the bill can highlight it. `at` restarts the highlight on repeat adds.
+  const [posLastAdded, setPosLastAdded] = useState<{ id: string; at: number } | null>(null);
+
+  useEffect(() => {
+    if (!posLastAdded) return;
+    const fade = setTimeout(() => setPosLastAdded(null), 3000);
+    return () => clearTimeout(fade);
+  }, [posLastAdded]);
 
   function addToPosCart(p: Product) {
+    setPosLastAdded({ id: p.id, at: Date.now() });
     setPosCart((prev) => {
       const existing = prev.find((item) => item.product.id === p.id);
       if (existing) {
@@ -50,6 +59,15 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
     setPosCart((prev) => prev.filter((item) => item.product.id !== productId));
   }
 
+  /** The product whose barcode or SKU is exactly this code. */
+  function productForCode(text: string): Product | undefined {
+    const code = cleanBarcodeValue(text.trim());
+    return (
+      products.find((p) => productBarcode(p) === code || legacyProductBarcode(p) === code) ??
+      products.find((p) => p.sku && cleanBarcodeValue(p.sku) === code)
+    );
+  }
+
   /**
    * Finds the product for a scanned code or typed text and adds it to the bill. Exact codes win
    * over name matches, so a scan never lands on the wrong product. Returns the product, if any.
@@ -57,11 +75,9 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
   function addScannedToPosCart(text: string): Product | undefined {
     const typed = text.trim();
     if (!typed) return;
-    const code = cleanBarcodeValue(typed);
     const term = typed.toLowerCase();
     const found =
-      products.find((p) => productBarcode(p) === code || legacyProductBarcode(p) === code) ??
-      products.find((p) => p.sku && cleanBarcodeValue(p.sku) === code) ??
+      productForCode(typed) ??
       products.find((p) => p.name.toLowerCase() === term) ??
       products.find((p) => p.name.toLowerCase().includes(term));
     if (found) {
@@ -163,6 +179,8 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
     removeFromPosCart,
     handlePosBarcodeKeydown,
     addScannedToPosCart,
+    posLastAdded,
+    productForCode,
     completePosOrder,
   };
 }

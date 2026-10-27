@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { Barcode, Camera, Receipt, Trash2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Barcode, Camera, CheckCircle2, Receipt, Trash2, X } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
 import { CameraScanner } from '@/components/admin/camera-scanner';
 import { today } from '@/components/admin/config';
@@ -9,6 +9,8 @@ import { money } from '@/lib/admin';
 export default function PosPage() {
   const {
     addScannedToPosCart,
+    posLastAdded,
+    productForCode,
     addToPosCart,
     busy,
     categories,
@@ -38,6 +40,16 @@ export default function PosPage() {
     updatePosQty,
   } = useAdmin();
   const [cameraOpen, setCameraOpen] = useState(false);
+  const billList = useRef<HTMLDivElement>(null);
+  const lastLine = posLastAdded && posCart.find((l) => l.product.id === posLastAdded.id);
+
+  // Bring the line that was just added into view in the bill.
+  useEffect(() => {
+    if (!posLastAdded) return;
+    billList.current
+      ?.querySelector(`[data-bill-item="${posLastAdded.id}"]`)
+      ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [posLastAdded]);
   return (
     <>
       <title>POS Billing · Kitchen admin | Swaadha</title>
@@ -67,9 +79,12 @@ export default function PosPage() {
             {cameraOpen && (
               <CameraScanner
                 onClose={() => setCameraOpen(false)}
+                isKnown={(code) => !!productForCode(code)}
                 onScan={(code) => {
                   const product = addScannedToPosCart(code);
-                  return product ? { ok: true, message: `Added ${product.name}` } : { ok: false, message: `No product for ${code}` };
+                  return product
+                    ? { ok: true, message: `Added ${product.name}`, item: product.name }
+                    : { ok: false, message: `No product for ${code}` };
                 }}
               />
             )}
@@ -102,8 +117,8 @@ export default function PosPage() {
                 const inCart = posCart.find((i) => i.product.id === p.id);
                 return (
                   <div
-                    key={p.id}
-                    className="pos-card"
+                    key={p.id + (posLastAdded?.id === p.id ? posLastAdded.at : '')}
+                    className={`pos-card ${posLastAdded?.id === p.id ? 'just-added' : ''}`}
                     onClick={() => addToPosCart(p)}
                     title={`Click to add ${p.name} to bill`}
                   >
@@ -167,14 +182,18 @@ export default function PosPage() {
             />
           </div>
 
-          <div className="pos-items-scroll">
+          <div className="pos-items-scroll" ref={billList}>
             {!posCart.length ? (
               <p style={{ textAlign: 'center', color: 'var(--ink-mute)', padding: '30px 10px', fontSize: 12 }}>
                 No items in bill yet.<br />Click products on the left or scan barcode.
               </p>
             ) : (
               posCart.map(({ product: p, quantity }) => (
-                <div key={p.id} className="pos-bill-item">
+                <div
+                  key={p.id + (posLastAdded?.id === p.id ? posLastAdded.at : '')}
+                  data-bill-item={p.id}
+                  className={`pos-bill-item ${posLastAdded?.id === p.id ? 'just-added' : ''}`}
+                >
                   <div className="pos-item-info">
                     <span className="pos-item-name">{p.name}</span>
                     <span className="pos-item-rate">{money(p.price)} / {p.weight}</span>
@@ -279,6 +298,15 @@ export default function PosPage() {
           </button>
         </div>
       </div>
+      {lastLine && !cameraOpen && (
+        <div key={posLastAdded!.at} className="pos-added-toast" role="status">
+          <CheckCircle2 size={18} />
+          <span>
+            <b>{lastLine.product.name}</b> added · {lastLine.quantity} in bill
+          </span>
+          <span className="pos-added-total">{money(posGrandTotal)}</span>
+        </div>
+      )}
     </>
   );
 }
