@@ -2273,3 +2273,166 @@ button.status:hover:not(:disabled) {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Sub-admin password */
+.password-field {
+  position: relative;
+}
+.password-field input:not([type='checkbox']) {
+  padding-right: 48px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.password-field button {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  transform: translateY(-50%);
+}
+.password-field button:hover {
+  background: var(--gold-50);
+  color: var(--red);
+}
+.password-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.password-actions .button {
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+.product-modal form > #member-password-help {
+  margin: -4px 0 0;
+}
+.permission-selector > b .text-link {
+  float: right;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* POS camera scanner */
+.pos-camera-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  margin-right: -8px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--on-dark);
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.pos-camera-button:hover {
+  background: var(--red-700);
+}
+.camera-scanner {
+  display: grid;
+  gap: 14px;
+}
+.camera-view {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  background: #111;
+}
+.camera-slot {
+  position: absolute;
+  inset: 0;
+}
+.camera-slot video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.camera-guide {
+  position: absolute;
+  inset: 32% 10%;
+  border: 2px solid var(--gold-500);
+  border-radius: 10px;
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.35);
+}
+.camera-guide::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 50%;
+  height: 2px;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: scan-line 1.6s ease-in-out infinite alternate;
+}
+@keyframes scan-line {
+  from {
+    transform: translateY(-28px);
+  }
+  to {
+    transform: translateY(28px);
+  }
+}
+.camera-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+.camera-overlay.problem {
+  background: rgba(0, 0, 0, 0.7);
+}
+.camera-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  color: var(--ink-soft);
+  font-size: 13.5px;
+}
+.camera-status.ok {
+  background: var(--gold-50);
+  color: var(--gold-700);
+  font-weight: 700;
+}
+.camera-status.miss {
+  background: var(--red-50);
+  color: var(--red-700);
+  font-weight: 700;
+}
+.camera-scanner .modal-actions .button {
+  flex: 1;
+}
+@media (max-width: 520px) {
+  .pos-camera-button span {
+    display: none;
+  }
+  .camera-view {
+    aspect-ratio: 3 / 4;
+  }
+  .camera-guide {
+    inset: 38% 8%;
+  }
+}

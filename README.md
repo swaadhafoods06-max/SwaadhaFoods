@@ -29,7 +29,7 @@ values ('YOUR-AUTH-USER-UUID','Your name','owner@example.com','owner','{}');
 
 6. Enable email/password registration and email confirmations in Supabase Authentication for customer accounts. Configure Site URL and allowed redirect URLs to your local and production origins. Set up production email delivery in Supabase before public launch.
 7. Restart the site. Sign in at `/admin`, create categories, and add your actual products and HTTPS image URLs. Public Supabase Storage image URLs work. Hide products/categories rather than deleting them.
-8. For a sub-admin, have the person create a customer account and confirm their email first. In **Sub-admins & access**, add their email and choose tabs. This grants access to an existing account; no invitation email is sent. They then sign into `/admin` with their own password.
+8. Run `supabase/006-sub-admin-pos-access.sql` so sub-admins can be given the POS Billing tab. To add a sub-admin, open **Sub-admins & access**, enter their name, email and a password (or generate one), and choose tabs. A confirmed login is created and they can sign into `/admin` right away; share the password privately. If the person already has a Swaadha account, leave the password blank to keep theirs. Owners can reset a sub-admin's password from the edit dialog. Creating accounts and resetting passwords needs `SUPABASE_SERVICE_ROLE_KEY` on the server.
 
 No credentials or live Supabase project are provisioned by this repository.
 

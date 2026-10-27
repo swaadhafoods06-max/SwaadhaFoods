@@ -3,7 +3,7 @@
 import React from 'react';
 import { Download, Printer, X, Copy, Check } from 'lucide-react';
 import { money } from '@/lib/admin';
-import type { Product } from '@/lib/products';
+import { MAX_LABEL_CODE_LENGTH, skuBarcode, type Product } from '@/lib/products';
 
 // Standard Code 39 Encoding Table (9 elements: 5 bars, 4 spaces, exactly 3 wide)
 const CODE39: Record<string, string> = {
@@ -25,8 +25,7 @@ export function cleanBarcodeValue(val: string): string {
   return cleaned || 'SW0001';
 }
 
-/** Longest code that still scans reliably on a 60 mm label from a 203-dpi thermal printer. */
-export const MAX_LABEL_CODE_LENGTH = 12;
+export { MAX_LABEL_CODE_LENGTH };
 
 /**
  * The code printed on a product's label and expected from the scanner. Products without a saved
@@ -42,12 +41,12 @@ export function legacyProductBarcode(p: Pick<Product, 'id'>): string {
 }
 
 /**
- * A new, short barcode: the SKU when it's short enough, otherwise SW + 6 digits.
+ * A new, short barcode: made from the SKU when it fits a label, otherwise SW + 6 digits.
  * `taken` holds existing codes so two products never share one.
  */
 export function generateBarcodeValue(sku?: string, taken: Iterable<string> = []): string {
   const used = new Set(taken);
-  const fromSku = sku?.trim() ? cleanBarcodeValue(sku.trim()) : '';
+  const fromSku = sku?.trim() ? skuBarcode(sku) : '';
   if (fromSku && fromSku.length <= MAX_LABEL_CODE_LENGTH && !used.has(fromSku)) return fromSku;
   let code: string;
   do {

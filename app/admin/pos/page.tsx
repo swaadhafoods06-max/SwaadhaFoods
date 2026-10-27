@@ -1,11 +1,14 @@
 'use client';
-import { Barcode, Receipt, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
+import { Barcode, Camera, Receipt, Trash2, X } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
+import { CameraScanner } from '@/components/admin/camera-scanner';
 import { today } from '@/components/admin/config';
 import { money } from '@/lib/admin';
 
 export default function PosPage() {
   const {
+    addScannedToPosCart,
     addToPosCart,
     busy,
     categories,
@@ -34,6 +37,7 @@ export default function PosPage() {
     setPosSearch,
     updatePosQty,
   } = useAdmin();
+  const [cameraOpen, setCameraOpen] = useState(false);
   return (
     <>
       <title>POS Billing · Kitchen admin | Swaadha</title>
@@ -56,7 +60,19 @@ export default function PosPage() {
                   <X size={15} />
                 </button>
               )}
+              <button type="button" className="pos-camera-button" aria-label="Scan a barcode with the camera" onClick={() => setCameraOpen(true)}>
+                <Camera size={17} /> <span>Scan</span>
+              </button>
             </div>
+            {cameraOpen && (
+              <CameraScanner
+                onClose={() => setCameraOpen(false)}
+                onScan={(code) => {
+                  const product = addScannedToPosCart(code);
+                  return product ? { ok: true, message: `Added ${product.name}` } : { ok: false, message: `No product for ${code}` };
+                }}
+              />
+            )}
             <div className="pos-category-pills">
               {['All', ...categories.map((c) => c.name)].map((cName) => (
                 <button

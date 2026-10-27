@@ -50,12 +50,13 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
     setPosCart((prev) => prev.filter((item) => item.product.id !== productId));
   }
 
-  // A barcode scanner types the code and presses Enter. Exact codes win over name matches,
-  // so a scan never lands on the wrong product.
-  function handlePosBarcodeKeydown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== 'Enter' || !posSearch.trim()) return;
-    e.preventDefault();
-    const typed = posSearch.trim();
+  /**
+   * Finds the product for a scanned code or typed text and adds it to the bill. Exact codes win
+   * over name matches, so a scan never lands on the wrong product. Returns the product, if any.
+   */
+  function addScannedToPosCart(text: string): Product | undefined {
+    const typed = text.trim();
+    if (!typed) return;
     const code = cleanBarcodeValue(typed);
     const term = typed.toLowerCase();
     const found =
@@ -69,8 +70,17 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
       setError('');
       setNotice(`Added "${found.name}" to bill.`);
     } else {
+      setPosSearch(typed);
       setError(`No product matches "${typed}". Check the label or search by name.`);
     }
+    return found;
+  }
+
+  // A USB/Bluetooth barcode scanner types the code and presses Enter.
+  function handlePosBarcodeKeydown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== 'Enter' || !posSearch.trim()) return;
+    e.preventDefault();
+    addScannedToPosCart(posSearch);
   }
 
   const posSubtotal = useMemo(() => posCart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [posCart]);
@@ -152,6 +162,7 @@ export function usePos({ products, run, setError, setNotice, setRevision }: Admi
     updatePosQty,
     removeFromPosCart,
     handlePosBarcodeKeydown,
+    addScannedToPosCart,
     completePosOrder,
   };
 }

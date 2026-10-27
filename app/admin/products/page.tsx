@@ -1,7 +1,6 @@
 'use client';
 import { Barcode, Pencil, Search, Trash2 } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
-import { productBarcode } from '@/components/admin/barcode';
 import { money } from '@/lib/admin';
 
 export default function ProductsPage() {
@@ -39,7 +38,6 @@ export default function ProductsPage() {
               <th>Category</th>
               <th>Price</th>
               <th>Stock</th>
-              <th>Barcode</th>
               <th>Visibility</th>
               <th>Action</th>
             </tr>
@@ -66,17 +64,6 @@ export default function ProductsPage() {
                 <td>{money(p.price)}</td>
                 <td>
                   <span className={`stock-indicator ${(p.stock ?? 0) < 5 ? 'low' : ''}`}>{p.stock ?? 0} packs</span>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    className="barcode-pill"
-                    title="Click to preview & print barcode label"
-                    onClick={() => setBarcodeModalProduct(p)}
-                  >
-                    <Barcode size={12} />
-                    {productBarcode(p)}
-                  </button>
                 </td>
                 <td>
                   <button

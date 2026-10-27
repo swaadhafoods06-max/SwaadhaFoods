@@ -569,7 +569,7 @@ declare
   target_id uuid;
 begin
   if not public.has_tab('team') then raise exception 'Owner access required.'; end if;
-  if p_permissions is null or not (p_permissions <@ array['dashboard','categories','products','banners','coupons','orders','reports']::text[]) then
+  if p_permissions is null or not (p_permissions <@ array['dashboard','pos','categories','products','banners','coupons','orders','reports']::text[]) then
     raise exception 'Invalid tab permissions.';
   end if;
   select id into target_id from auth.users where lower(email)=lower(trim(p_email));

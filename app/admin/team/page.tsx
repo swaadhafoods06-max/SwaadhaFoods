@@ -13,8 +13,8 @@ export default function TeamPage() {
         <div>
           <b>Owner-controlled access</b>
           <p>
-            Sub-admins see only their assigned tabs. Create an account on the customer login page first, then grant access using that
-            email. Only owners can manage this page.
+            Sub-admins see only their assigned tabs. Add one with an email and password and they can sign in at /admin straight away, or
+            leave the password blank to grant access to an existing Swaadha account. Only owners can manage this page.
           </p>
         </div>
       </div>

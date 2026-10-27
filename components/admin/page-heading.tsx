@@ -1,12 +1,25 @@
 'use client';
-import { Plus } from 'lucide-react';
+import { Plus, RefreshCw } from 'lucide-react';
 import { tabLabels } from '@/lib/admin';
 import { useAdmin } from './context';
 import { defaultBanner, defaultCoupon, defaultProduct, pageIntros } from './config';
 
-/** Page title, intro line, and the page's "Add …" button. */
+/** Page title, intro line, and the page's "Add …" button (plus "Update old SKUs" on Products). */
 export function AdminPageHeading() {
-  const { tab, member, categories, banners, setProductEdit, setCategoryEdit, setBannerEdit, setCouponEdit, setMemberEdit } = useAdmin();
+  const {
+    tab,
+    member,
+    busy,
+    categories,
+    banners,
+    oldSkuCount,
+    updateOldSkus,
+    setProductEdit,
+    setCategoryEdit,
+    setBannerEdit,
+    setCouponEdit,
+    setMemberEdit,
+  } = useAdmin();
 
   return (
     <div className="admin-page-heading">
@@ -20,13 +33,20 @@ export function AdminPageHeading() {
       </div>
 
       {tab === 'products' && (
-        <button
-          className="button"
-          onClick={() => setProductEdit({ ...defaultProduct, category: categories[0]?.name || '' })}
-          disabled={!categories.length}
-        >
-          <Plus size={17} /> Add product
-        </button>
+        <div className="modal-actions">
+          {oldSkuCount > 0 && (
+            <button className="button outline" onClick={updateOldSkus} disabled={busy} title="Give older products an SW-MNG001 SKU and barcode">
+              <RefreshCw size={16} /> Update {oldSkuCount} old SKU{oldSkuCount === 1 ? '' : 's'}
+            </button>
+          )}
+          <button
+            className="button"
+            onClick={() => setProductEdit({ ...defaultProduct, category: categories[0]?.name || '' })}
+            disabled={!categories.length}
+          >
+            <Plus size={17} /> Add product
+          </button>
+        </div>
       )}
       {tab === 'categories' && (
         <button className="button" onClick={() => setCategoryEdit({ name: '', description: '', enabled: true })}>

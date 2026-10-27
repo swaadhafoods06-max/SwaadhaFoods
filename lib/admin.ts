@@ -28,6 +28,29 @@ export function getCategoryImage(c: { name: string; image?: string | null }): st
   return defaultCategoryImages[c.name] || '/images/hero.webp';
 }
 export type Member = { user_id: string; email: string; name: string; role: 'owner' | 'staff'; permissions: string[] };
+/** A member being added or edited. `password` is only sent to the server, never stored in `admins`. */
+export type MemberDraft = Member & { password?: string };
+
+/** Sub-admin password rule, shared by the form and the server. Returns the problem, or '' when it is fine. */
+export function passwordProblem(password: string) {
+  if (password.length < 8) return 'Password must be at least 8 characters.';
+  if (password.length > 72) return 'Password must be 72 characters or fewer.';
+  if (!/[a-z]/i.test(password) || !/[0-9]/.test(password)) return 'Password must include at least one letter and one number.';
+  return '';
+}
+
+/** A random 14-character password with letters, digits and a symbol, avoiding look-alike characters. */
+export function generatePassword() {
+  const letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+  const digits = '23456789';
+  const all = letters + digits + '!@#$%&*';
+  const values = crypto.getRandomValues(new Uint32Array(14));
+  const chars = Array.from(values, (v) => all[v % all.length]);
+  chars[0] = letters[values[0] % letters.length];
+  chars[1] = digits[values[1] % digits.length];
+  chars[2] = '!@#$%&*'[values[2] % 7];
+  return chars.join('');
+}
 export const statuses = ['pending', 'confirmed', 'preparing', 'dispatched', 'delivered', 'cancelled'] as const;
 
 export type Order = {

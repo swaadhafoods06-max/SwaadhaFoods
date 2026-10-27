@@ -1,11 +1,19 @@
 'use client';
-import { Barcode, Check, Upload } from 'lucide-react';
-import { cleanBarcodeValue, generateBarcodeValue, MAX_LABEL_CODE_LENGTH, productBarcode } from '../barcode';
+import { useState } from 'react';
+import { Check, Upload, Wand2 } from 'lucide-react';
+import { generateSku, MAX_LABEL_CODE_LENGTH, skuBarcode } from '@/lib/products';
+import { productBarcode } from '../barcode';
 import { Modal } from '../modal';
 import { useAdmin } from '../context';
 
 /** Add or edit a product. */
 export function ProductDialog() {
+  const { productEdit } = useAdmin();
+  // Mounted fresh each time the dialog opens, so the SKU auto-fill starts over.
+  return productEdit ? <ProductForm /> : null;
+}
+
+function ProductForm() {
   const {
     productEdit,
     busy,
@@ -17,18 +25,26 @@ export function ProductDialog() {
     setProductEdit,
     uploadingImage,
   } = useAdmin();
+  const draft = productEdit!;
+  // New products (and old ones without a SKU) get their SKU from the name until it's typed by hand.
+  const [skuAuto, setSkuAuto] = useState(!draft.id || !draft.sku?.trim());
   if (!productEdit) return null;
 
-  // Codes already used by other products, so a new one never clashes.
-  const takenCodes = products.filter((p) => p.id !== productEdit.id).map(productBarcode);
-  const typedCode = productEdit.barcode?.trim() ? cleanBarcodeValue(productEdit.barcode.trim()) : '';
-  const codeWarning = !typedCode
+  const others = products.filter((p) => p.id !== productEdit.id);
+  const otherSkus = others.map((p) => p.sku);
+  const sku = productEdit.sku?.trim() ?? '';
+  // The barcode label is made from the SKU, so it must be unique and short enough to scan.
+  const skuWarning = !sku
     ? ''
-    : takenCodes.includes(typedCode)
-      ? 'Another product already uses this code. Press Auto for a new one.'
-      : typedCode.length > MAX_LABEL_CODE_LENGTH
-        ? `Too long to scan on a small sticker. Keep it to ${MAX_LABEL_CODE_LENGTH} characters or press Auto.`
+    : otherSkus.some((s) => s?.trim().toUpperCase() === sku.toUpperCase()) || others.map(productBarcode).includes(skuBarcode(sku))
+      ? 'Another product already uses this SKU. Press Auto for a new one.'
+      : skuBarcode(sku).length > MAX_LABEL_CODE_LENGTH
+        ? `Too long for a barcode label. Keep it to ${MAX_LABEL_CODE_LENGTH} characters or press Auto.`
         : '';
+
+  function changeName(name: string) {
+    setProductEdit({ ...productEdit!, name, ...(skuAuto && { sku: generateSku(name, otherSkus) }) });
+  }
 
   return (
     <Modal title={productEdit.id ? 'Edit product' : 'Add a favorite'} onClose={() => setProductEdit(null)}>
@@ -40,7 +56,7 @@ export function ProductDialog() {
               required
               maxLength={120}
               value={productEdit.name}
-              onChange={(e) => setProductEdit({ ...productEdit, name: e.target.value })}
+              onChange={(e) => changeName(e.target.value)}
             />
           </label>
           <label>
@@ -93,45 +109,45 @@ export function ProductDialog() {
           </label>
           <label>
             SKU (Item code)
-            <input
-              maxLength={50}
-              placeholder="e.g. SW-MANGO-250"
-              value={productEdit.sku ?? ''}
-              onChange={(e) => setProductEdit({ ...productEdit, sku: e.target.value })}
-            />
-          </label>
-        </div>
-        <div className="form-row">
-          <label>
-            Barcode / Barcode Value
             <div style={{ display: 'flex', gap: 6 }}>
               <input
                 maxLength={50}
-                placeholder="e.g. SW100482"
-                value={productEdit.barcode ?? ''}
-                onChange={(e) => setProductEdit({ ...productEdit, barcode: e.target.value })}
+                placeholder="Fills in as you type the name"
+                value={productEdit.sku ?? ''}
+                onChange={(e) => {
+                  setSkuAuto(false);
+                  setProductEdit({ ...productEdit, sku: e.target.value });
+                }}
               />
               <button
                 type="button"
                 className="button outline"
                 style={{ padding: '0 12px', fontSize: 11, whiteSpace: 'nowrap', borderRadius: 6 }}
-                title="Generate unique barcode"
-                onClick={() =>
-                  setProductEdit({
-                    ...productEdit,
-                    barcode: generateBarcodeValue(productEdit.sku, takenCodes),
-                  })
-                }
+                title="Make the SKU from the product name"
+                disabled={!productEdit.name.trim()}
+                onClick={() => {
+                  setSkuAuto(true);
+                  setProductEdit({ ...productEdit, sku: generateSku(productEdit.name, otherSkus) });
+                }}
               >
-                <Barcode size={14} /> Auto
+                <Wand2 size={14} /> Auto
               </button>
             </div>
-          </label>
-          <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 6 }}>
-            <small style={{ color: codeWarning ? 'var(--red)' : 'var(--ink-mute)', fontSize: 11, fontWeight: codeWarning ? 700 : 400 }}>
-              {codeWarning || 'Leave empty to get a short code automatically. Scannable at the POS counter.'}
+            <small
+              style={{
+                color: skuWarning ? 'var(--red)' : 'var(--ink-mute)',
+                fontSize: 11,
+                fontWeight: skuWarning ? 700 : 400,
+                textTransform: 'none',
+                letterSpacing: 0,
+              }}
+            >
+              {skuWarning ||
+                (skuAuto
+                  ? 'Auto: SW + 3 letters of the name + next number. The barcode label is made from this SKU.'
+                  : 'Typed by hand. Press Auto to make it from the name. The barcode label is made from this SKU.')}
             </small>
-          </div>
+          </label>
         </div>
         <label>
           Short description
