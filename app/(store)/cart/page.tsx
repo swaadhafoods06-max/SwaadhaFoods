@@ -206,7 +206,7 @@ export default function Cart() {
 
   const packs = cart.reduce((n, i) => n + i.quantity, 0);
   // A few favorites that aren't in the bag yet.
-  const suggestions = menu.filter((p) => (p.stock ?? 0) > 0 && !cart.some((i) => i.product.id === p.id)).slice(0, 4);
+  const suggestions = menu.filter((p) => (p.stock ?? 0) > 0 && !cart.some((i) => i.product.id === p.id)).slice(0, 5);
   const suggestionRow = suggestions.length > 0 && (
     <div className="sw-cart-more">
       <div className="sw-head is-split">

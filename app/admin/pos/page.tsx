@@ -41,11 +41,16 @@ export default function PosPage() {
   } = useAdmin();
   const [cameraOpen, setCameraOpen] = useState(false);
   const billList = useRef<HTMLDivElement>(null);
+  const billPanel = useRef<HTMLDivElement>(null);
   const lastLine = posLastAdded && posCart.find((l) => l.product.id === posLastAdded.id);
 
   // Bring the line that was just added into view in the bill.
   useEffect(() => {
     if (!posLastAdded) return;
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      setCameraOpen(false);
+      requestAnimationFrame(()=>billPanel.current?.scrollIntoView({block:'start',behavior:'smooth'}));
+    }
     billList.current
       ?.querySelector(`[data-bill-item="${posLastAdded.id}"]`)
       ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -149,7 +154,7 @@ export default function PosPage() {
         </div>
 
         {/* Right: Current Register Bill */}
-        <div className="pos-bill-panel">
+        <div className="pos-bill-panel" ref={billPanel}>
           <div className="pos-bill-header">
             <div>
               <h3>Current Register Bill</h3>

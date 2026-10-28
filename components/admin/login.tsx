@@ -1,10 +1,12 @@
 'use client';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useAdmin } from './context';
 
 /** The sign-in screen shown to anyone who isn't signed in as an admin. */
 export function AdminLogin() {
+  const [showPassword, setShowPassword] = useState(false);
   const { email, setEmail, password, setPassword, login, error, busy } = useAdmin();
 
   return (
@@ -32,14 +34,14 @@ export function AdminLogin() {
             </label>
             <label>
               Password
-              <input
+              <span className="admin-password-field"><input
                 required
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-              />
+              /><button type="button" aria-label={showPassword?"Hide password":"Show password"} aria-pressed={showPassword} onClick={()=>setShowPassword(v=>!v)}>{showPassword?<EyeOff size={19}/>:<Eye size={19}/>}</button></span>
             </label>
 
             {error && (

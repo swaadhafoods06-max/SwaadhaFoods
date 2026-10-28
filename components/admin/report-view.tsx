@@ -121,7 +121,7 @@ export function ReportView({ tab }: { tab: 'dashboard' | 'reports' }) {
                     </p>
                   </div>
                 </div>
-                <div className="admin-table">
+                <div className="admin-table report-mobile-boxes">
                   <table>
                     <thead>
                       <tr>
@@ -133,9 +133,9 @@ export function ReportView({ tab }: { tab: 'dashboard' | 'reports' }) {
                     <tbody>
                       {report.daily.map((d) => (
                         <tr key={d.day}>
-                          <td>{d.day}</td>
-                          <td>{d.orders}</td>
-                          <td>{money(d.value)}</td>
+                          <td data-label="Date">{d.day}</td>
+                          <td data-label="Order requests">{d.orders}</td>
+                          <td data-label="Order value">{money(d.value)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -146,7 +146,7 @@ export function ReportView({ tab }: { tab: 'dashboard' | 'reports' }) {
 
               <section className="dashboard-card report-detail">
                 <h3>Most ordered products</h3>
-                <div className="admin-table">
+                <div className="admin-table report-mobile-boxes">
                   <table>
                     <thead>
                       <tr>
@@ -158,9 +158,9 @@ export function ReportView({ tab }: { tab: 'dashboard' | 'reports' }) {
                     <tbody>
                       {report.top_products.map((p) => (
                         <tr key={p.name}>
-                          <td>{p.name}</td>
-                          <td>{p.quantity}</td>
-                          <td>{money(p.value)}</td>
+                          <td data-label="Product">{p.name}</td>
+                          <td data-label="Units requested">{p.quantity}</td>
+                          <td data-label="Order value">{money(p.value)}</td>
                         </tr>
                       ))}
                     </tbody>

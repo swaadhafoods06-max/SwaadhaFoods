@@ -1,6 +1,6 @@
 'use client';
 import { FormEvent, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-admin';
 import { Category } from '@/lib/admin';
 import type { Draft } from '../config';
 import type { AdminData } from './use-admin-data';

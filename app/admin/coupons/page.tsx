@@ -1,4 +1,5 @@
 'use client';
+import { ResponsiveRecords } from '@/components/admin/responsive-records';
 import { Pencil, Search, Trash2 } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
 import { money } from '@/lib/admin';
@@ -29,28 +30,18 @@ export default function CouponsPage() {
           />
         </label>
       </div>
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Code</th>
-              <th>Discount</th>
-              <th>Min order</th>
-              <th>Usage</th>
-              <th>Expiry date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="admin-box-list">
+        <div className="admin-box-container">
+          
+          <ResponsiveRecords>
             {matchedCoupons.map((c) => (
-              <tr key={c.id}>
-                <td>
+              <article className="admin-record-box" key={c.id}>
+                <div className="admin-record-field" data-label="Code">
                   <strong style={{ letterSpacing: '1px', color: 'var(--red)' }}>{c.code}</strong>
                   <br />
                   <small>{c.description || 'Promotional coupon'}</small>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Discount">
                   <b>{c.discount_type === 'percentage' ? `${c.discount_value}% off` : `₹${c.discount_value} flat off`}</b>
                   {c.max_discount ? (
                     <small>
@@ -58,13 +49,13 @@ export default function CouponsPage() {
                       Up to ₹{c.max_discount}
                     </small>
                   ) : null}
-                </td>
-                <td>{c.min_order_value ? money(c.min_order_value) : 'No minimum'}</td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Min order">{c.min_order_value ? money(c.min_order_value) : 'No minimum'}</div>
+                <div className="admin-record-field" data-label="Usage">
                   {c.times_used} {c.usage_limit ? `/ ${c.usage_limit}` : 'uses'}
-                </td>
-                <td>{c.expiry_date ? new Date(c.expiry_date).toLocaleDateString('en-IN') : 'No expiry'}</td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Expiry date">{c.expiry_date ? new Date(c.expiry_date).toLocaleDateString('en-IN') : 'No expiry'}</div>
+                <div className="admin-record-field" data-label="Status">
                   <button
                     disabled={busy}
                     className={`status ${c.is_active ? 'available' : ''}`}
@@ -72,8 +63,8 @@ export default function CouponsPage() {
                   >
                     {c.is_active ? 'Active' : 'Disabled'}
                   </button>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Actions">
                   <div className="order-list-actions">
                     <button className="table-action" aria-label={`Edit ${c.code}`} onClick={() => setCouponEdit(c)}>
                       <Pencil size={15} /> Edit
@@ -82,11 +73,11 @@ export default function CouponsPage() {
                       <Trash2 size={15} />
                     </button>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </article>
             ))}
-          </tbody>
-        </table>
+          </ResponsiveRecords>
+        </div>
         {!matchedCoupons.length && <p className="empty">No coupons configured. Create a promotional code for your shoppers.</p>}
       </div>
       <p className="table-help">Customers can enter active coupon codes at cart checkout. Discounts are verified server-side.</p>

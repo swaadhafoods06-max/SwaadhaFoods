@@ -115,6 +115,19 @@ export function BannerDialog() {
           )}
         </div>
 
+        <label>
+          Mobile banner image URL (optional)
+          <input type="text" placeholder="Upload a portrait image for phones" value={bannerEdit.mobile_image ?? ''} onChange={e => setBannerEdit({...bannerEdit, mobile_image:e.target.value})} />
+        </label>
+        <p className="demo-note">Recommended mobile size: 900 × 1200 px. Leave empty to use the desktop image.</p>
+        <div className="storage-uploader-box">
+          <label className="upload-btn-label"><Upload size={14}/> {uploadingImage ? 'Uploading…' : 'Upload mobile banner'}
+            <input type="file" accept="image/*" disabled={uploadingImage} style={{display:'none'}} onChange={e => {const file=e.target.files?.[0];if(file)handleFileUpload(file,'banners',url=>setBannerEdit(prev=>prev?{...prev,mobile_image:url}:null));}}/>
+          </label>
+          {bannerEdit.mobile_image && <img src={bannerEdit.mobile_image} alt="Mobile banner preview" style={{width:60,height:80,objectFit:'cover',borderRadius:4}}/>}
+          {bannerEdit.mobile_image && <button type="button" className="button outline" onClick={()=>setBannerEdit({...bannerEdit,mobile_image:''})}>Use desktop image</button>}
+        </div>
+
         <label className="checkbox">
           <input
             type="checkbox"

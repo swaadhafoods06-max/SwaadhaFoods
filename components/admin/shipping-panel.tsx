@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { ArrowUpRight, Download, RefreshCw, Truck } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-admin';
 import type { Order } from '@/lib/admin';
 
 export function ShippingPanel({ order, onChanged }: { order: Order; onChanged: () => void }) {

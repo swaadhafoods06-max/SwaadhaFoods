@@ -1,7 +1,7 @@
 'use client';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-admin';
 import { Product, withDetails } from '@/lib/products';
 import { Banner, calculateMetrics, Category, Coupon, exportCsv, Member, Metrics, Order, Tab, tabs } from '@/lib/admin';
 import { emptyMetrics, startDate, today } from '../config';

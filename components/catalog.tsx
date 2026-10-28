@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import { Search, X, Leaf, CalendarDays } from 'lucide-react';
 import { Product } from '@/lib/products';
 import { Category, getCategoryImage } from '@/lib/admin';
 import { loadMenu } from '@/lib/storefront';
@@ -8,7 +10,11 @@ import { ProductCard } from './product-card';
 
 const ALL = 'All favorites';
 
-export function Catalog({ featured = false }: { featured?: boolean }) {
+export function Catalog({featured=false}:{featured?:boolean}) {return <Suspense fallback={<p>Loading kitchen…</p>}><CatalogContent featured={featured}/></Suspense>}
+function CatalogContent({ featured = false }: { featured?: boolean }) {
+  const searchParams=useSearchParams();
+  const selectedCategory=searchParams.get("category")||ALL;
+  useEffect(()=>{setCategory(selectedCategory);setQuery('')},[selectedCategory]);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [category, setCategory] = useState(ALL);
@@ -79,7 +85,8 @@ export function Catalog({ featured = false }: { featured?: boolean }) {
       )}
 
       {/* HOME PAGE (featured): pills only. PRODUCTS PAGE: search only. */}
-      <div className={`sw-catalog-tools ${featured ? 'is-featured' : ''}`}>
+      <div className={`sw-catalog-tools ${featured ? 'is-featured' : 'shop-search-row'}`}>
+        {!featured&&<div className="sw-shop-notes"><span><Leaf size={15}/> Small batches. Real ingredients.</span><span><CalendarDays size={15}/> Made fresh — order 6–7 days ahead</span></div>}
         {featured && (
           <div className="sw-filter" ref={pills} role="group" aria-label="Filter by category">
             {names.map((c) => (

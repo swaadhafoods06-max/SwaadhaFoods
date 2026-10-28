@@ -1,4 +1,5 @@
 'use client';
+import { ResponsiveRecords } from '@/components/admin/responsive-records';
 import { Pencil, Search, Trash2 } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
 
@@ -28,43 +29,34 @@ export default function BannersPage() {
           />
         </label>
       </div>
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Order</th>
-              <th>Banner image</th>
-              <th>Heading & tag</th>
-              <th>Storefront link</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="admin-box-list">
+        <div className="admin-box-container">
+          
+          <ResponsiveRecords>
             {matchedBanners.map((b) => (
-              <tr key={b.id}>
-                <td>
+              <article className="admin-record-box" key={b.id}>
+                <div className="admin-record-field" data-label="Order">
                   <b>#{b.display_order}</b>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Banner image">
                   <div className="table-product">
                     <img src={b.image} alt={b.title} style={{ width: 68, height: 42, objectFit: 'cover', borderRadius: 4 }} />
                     <div>
                       <b>{b.label || 'Hero slide'}</b>
                     </div>
                   </div>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Heading & tag">
                   <b>
                     {b.title} <em>{b.em}</em>
                   </b>
                   <br />
                   <small>{b.tag}</small>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Storefront link">
                   <small>{b.href}</small>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Status">
                   <button
                     disabled={busy}
                     className={`status ${b.is_active ? 'available' : ''}`}
@@ -72,8 +64,8 @@ export default function BannersPage() {
                   >
                     {b.is_active ? 'Active' : 'Draft'}
                   </button>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Actions">
                   <div className="order-list-actions">
                     <button className="table-action" aria-label={`Edit ${b.title}`} onClick={() => setBannerEdit(b)}>
                       <Pencil size={15} /> Edit
@@ -82,11 +74,11 @@ export default function BannersPage() {
                       <Trash2 size={15} />
                     </button>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </article>
             ))}
-          </tbody>
-        </table>
+          </ResponsiveRecords>
+        </div>
         {!matchedBanners.length && <p className="empty">No banners found. Add a hero banner to feature on your home page.</p>}
       </div>
       <p className="table-help">

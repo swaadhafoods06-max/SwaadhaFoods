@@ -61,6 +61,7 @@ export const defaultProduct: Draft<Product> = {
 };
 
 export const defaultBanner: Draft<Banner> = {
+  mobile_image: "",
   tag: 'THE SWAADHA FAMILY KITCHEN',
   title: '',
   em: '',

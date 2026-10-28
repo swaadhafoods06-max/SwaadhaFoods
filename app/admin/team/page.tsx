@@ -1,4 +1,5 @@
 'use client';
+import { ResponsiveRecords } from '@/components/admin/responsive-records';
 import { Pencil, ShieldCheck, Trash2 } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
 import { navigation } from '@/components/admin/config';
@@ -18,27 +19,20 @@ export default function TeamPage() {
           </p>
         </div>
       </div>
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Team member</th>
-              <th>Role</th>
-              <th>Tab access</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="admin-box-list">
+        <div className="admin-box-container">
+          
+          <ResponsiveRecords>
             {members.map((m) => (
-              <tr key={m.user_id}>
-                <td>
+              <article className="admin-record-box" key={m.user_id}>
+                <div className="admin-record-field" data-label="Team member">
                   <b>{m.name}</b>
                   <small>{m.email || 'Owner account'}</small>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Role">
                   <span className="status available">{m.role === 'owner' ? 'Owner' : 'Sub-admin'}</span>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Tab access">
                   <div className="permission-pills">
                     {m.role === 'owner' ? (
                       <span>All tabs</span>
@@ -48,8 +42,8 @@ export default function TeamPage() {
                       <span>No tabs assigned</span>
                     )}
                   </div>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Actions">
                   {m.role === 'staff' ? (
                     <div className="team-actions">
                       <button aria-label={`Edit access for ${m.name}`} onClick={() => setMemberEdit(m)}>
@@ -62,11 +56,11 @@ export default function TeamPage() {
                   ) : (
                     <small>Protected owner</small>
                   )}
-                </td>
-              </tr>
+                </div>
+              </article>
             ))}
-          </tbody>
-        </table>
+          </ResponsiveRecords>
+        </div>
       </div>
     </>
   );

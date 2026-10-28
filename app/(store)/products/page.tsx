@@ -26,14 +26,6 @@ export default function Products() {
       </PageHero>
 
       <section className="sw-section sw-shop" id="kitchen-menu">
-        <div className="sw-shop-notes" data-reveal="fade">
-          <span>
-            <Leaf size={15} /> Small batches. Real ingredients.
-          </span>
-          <span>
-            <CalendarDays size={15} /> Made fresh — order 6–7 days ahead
-          </span>
-        </div>
         <Catalog />
         <div className="sw-callout" data-reveal="up">
           <div>

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-admin';
 import { Product } from '@/lib/products';
 import { Order } from '@/lib/admin';
 import { cleanBarcodeValue, legacyProductBarcode, productBarcode } from '../barcode';

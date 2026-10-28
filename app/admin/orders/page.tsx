@@ -1,4 +1,5 @@
 'use client';
+import { ResponsiveRecords } from '@/components/admin/responsive-records';
 import { useState } from 'react';
 import { ArrowUpRight, CalendarDays, Download, IndianRupee, Search, ShoppingBag } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
@@ -81,28 +82,20 @@ export default function OrdersPage() {
           ))}
         </select>
       </div>
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Order / customer</th>
-              <th>Requested date</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="admin-box-list">
+        <div className="admin-box-container">
+          
+          <ResponsiveRecords>
             {visibleOrders.map((o) => (
-              <tr key={o.id}>
-                <td>
+              <article className="admin-record-box" key={o.id}>
+                <div className="admin-record-field" data-label="Order / customer">
                   <b>#{o.id.slice(0, 10).toUpperCase()}</b>
                   <small>{o.customer_name}{o.phone && ` (${o.phone})`}</small>
                   {o.coupon_code && <small style={{ color: 'var(--red)' }}> · Coupon: {o.coupon_code}</small>}
-                </td>
-                <td>{o.requested_date}</td>
-                <td>{money(o.total)}</td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Requested date">{o.requested_date}</div>
+                <div className="admin-record-field" data-label="Total">{money(o.total)}</div>
+                <div className="admin-record-field" data-label="Status">
                   <select
                     className="order-status-select"
                     aria-label={`Status for ${o.id}`}
@@ -114,8 +107,8 @@ export default function OrdersPage() {
                       <option key={s}>{s}</option>
                     ))}
                   </select>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Details">
                   <div className="order-list-actions">
                     <button className="table-action" onClick={() => setOrderDetail(o)}>
                       View <ArrowUpRight size={15} />
@@ -124,11 +117,11 @@ export default function OrdersPage() {
                       <Download size={14} /> Invoice
                     </button>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </article>
             ))}
-          </tbody>
-        </table>
+          </ResponsiveRecords>
+        </div>
         {!visibleOrders.length && <p className="empty">No matching orders.</p>}
       </div>
       <p className="table-help">Orders placed at checkout appear here. WhatsApp messages do not automatically create an order record.</p>

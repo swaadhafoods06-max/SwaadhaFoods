@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowUpRight, CalendarDays, Check, Heart, Leaf, Minus, Package, Plus, ShieldCheck, ShoppingBag, Truck, X, ZoomIn } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, CalendarDays, Check, Share2, Heart, Leaf, Minus, Package, Plus, ShieldCheck, ShoppingBag, Truck, X, ZoomIn } from 'lucide-react';
 import { loadMenu } from '@/lib/storefront';
 import { Product } from '@/lib/products';
 import { money } from '@/lib/admin';
@@ -18,6 +18,8 @@ export function ProductDetail({ id }: { id: string }) {
     [added, setAdded] = useState(false),
     [zoom, setZoom] = useState(false),
     [broken, setBroken] = useState(false);
+  const [shareNotice,setShareNotice] = useState('');
+  async function shareProduct(){const url=window.location.href;try{if(navigator.share){await navigator.share({title:product?.name,text:product?.description,url});setShareNotice('')}else{await navigator.clipboard.writeText(url);setShareNotice('Product link copied.')}}catch(e){if((e as Error).name!=='AbortError')setShareNotice('Unable to share. Copy the page link from your browser.')}}
   const { add, toggleWish, wishlist } = useCommerce();
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function ProductDetail({ id }: { id: string }) {
             data.products
               .filter((x) => x.id !== id)
               .sort((a, b) => Number(b.category === p?.category) - Number(a.category === p?.category))
-              .slice(0, 4)
+              .slice(0, 5)
           );
           setQty(1);
         }
@@ -209,7 +211,9 @@ export function ProductDetail({ id }: { id: string }) {
                 >
                   <Heart size={19} fill={wished ? 'currentColor' : 'none'} />
                 </button>
+                <button type="button" className="sw-pd-share-button" onClick={shareProduct} aria-label="Share this product" title="Share product"><Share2 size={19}/></button>
               </div>
+              {shareNotice && <span className="sw-share-notice" role="status">{shareNotice}</span>}
               <button className={`sw-btn is-red is-block is-large ${added ? 'is-done' : ''}`} disabled={!valid} onClick={addToBag}>
                 {added ? <Check size={18} /> : <ShoppingBag size={18} />}
                 <span>{stock ? (added ? 'Added to your bag' : 'Add to bag') : 'Currently sold out'}</span>

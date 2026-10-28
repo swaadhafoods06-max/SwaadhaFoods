@@ -23,8 +23,8 @@ export function AdminTopBar({ onMenu }: { onMenu: () => void }) {
             {member.role}
           </span>
         )}
-        <button onClick={signOut}>
-          <LogOut size={15} /> Sign out
+        <button className="admin-signout" aria-label="Sign out" title="Sign out" onClick={signOut}>
+          <LogOut size={18} /><span className="admin-signout-label">Sign out</span>
         </button>
       </div>
     </div>

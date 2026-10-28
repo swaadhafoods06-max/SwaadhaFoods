@@ -70,6 +70,7 @@ export function SiteFooter() {
 
       <div className="sw-footer-legal">
         <span>© {new Date().getFullYear()} Swaadha. All rights reserved.</span>
+        <div className="sw-footer-policy-links"><Link href="/terms-and-conditions">Terms &amp; Conditions</Link><Link href="/privacy-policy">Privacy Policy</Link></div>
         <span className="sw-footer-credit">
           Designed &amp; developed by{' '}
           <a href="https://rakvih.in" target="_blank" rel="noopener">

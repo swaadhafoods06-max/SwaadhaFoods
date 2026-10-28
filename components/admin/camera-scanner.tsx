@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Camera, CheckCircle2, SwitchCamera, TriangleAlert } from 'lucide-react';
+import { Camera, CheckCircle2, TriangleAlert } from 'lucide-react';
 import type { BrowserMultiFormatOneDReader } from '@zxing/browser';
 import { Modal } from './modal';
 
@@ -159,12 +159,6 @@ export function CameraScanner({
     };
   }, [deviceId]);
 
-  function switchCamera() {
-    const list = cameras.current;
-    const current = list.findIndex((c) => c.deviceId === activeCamera.current);
-    setDeviceId(list[(current + 1) % list.length].deviceId);
-  }
-
   async function readPhoto(file: File) {
     setReadingPhoto(true);
     try {
@@ -234,11 +228,6 @@ export function CameraScanner({
               }}
             />
           </label>
-          {canSwitch && (
-            <button type="button" className="button outline" onClick={switchCamera} disabled={starting}>
-              <SwitchCamera size={16} /> Switch camera
-            </button>
-          )}
           <button type="button" className="button" onClick={onClose}>
             Done
           </button>

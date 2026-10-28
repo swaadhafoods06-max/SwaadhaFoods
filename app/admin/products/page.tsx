@@ -1,4 +1,6 @@
 'use client';
+import { ResponsiveRecords } from '@/components/admin/responsive-records';
+import { useState } from 'react';
 import { Barcode, Pencil, Search, Trash2 } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
 import { money } from '@/lib/admin';
@@ -15,6 +17,10 @@ export default function ProductsPage() {
     setQuery,
     toggleProduct,
   } = useAdmin();
+  const [category,setCategory]=useState('');
+  const [minPrice,setMinPrice]=useState(''),[maxPrice,setMaxPrice]=useState(''),[stockFilter,setStockFilter]=useState('');
+  const filteredProducts=matchedProducts.filter(p=>(!category||p.category===category)&&(!minPrice||p.price>=Number(minPrice))&&(!maxPrice||p.price<=Number(maxPrice))&&(!stockFilter||(stockFilter==='in'?(p.stock??0)>0:stockFilter==='low'?(p.stock??0)>0&&(p.stock??0)<5:(p.stock??0)<=0)));
+  const invalidPrice=!!minPrice&&!!maxPrice&&Number(minPrice)>Number(maxPrice);
   return (
     <>
       <title>Products · Kitchen admin | Swaadha</title>
@@ -30,22 +36,22 @@ export default function ProductsPage() {
           />
         </label>
       </div>
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Visibility</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {matchedProducts.map((p) => (
-              <tr key={p.id}>
-                <td>
+      <div className="admin-product-filters">
+        <label>Category<select value={category} onChange={e=>setCategory(e.target.value)}><option value="">All categories</option>{[...new Set(products.map(p=>p.category))].sort().map(c=><option key={c}>{c}</option>)}</select></label>
+        <label>Min price (₹)<input type="number" min="0" value={minPrice} onChange={e=>setMinPrice(e.target.value)} placeholder="0"/></label>
+        <label>Max price (₹)<input type="number" min="0" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} placeholder="Any"/></label>
+        <label>Stock<select value={stockFilter} onChange={e=>setStockFilter(e.target.value)}><option value="">All stock</option><option value="in">In stock</option><option value="low">Low stock (1–4)</option><option value="out">Out of stock</option></select></label>
+        <button type="button" className="button outline" onClick={()=>{setCategory('');setMinPrice('');setMaxPrice('');setStockFilter('');setQuery('')}}>Reset filters</button>
+      </div>
+      {invalidPrice&&<p className="error" role="alert">Maximum price must be at least the minimum price.</p>}
+      <p className="table-help" role="status">{filteredProducts.length} matching products</p>
+      <div className="admin-box-list">
+        <div className="admin-box-container">
+          
+          <ResponsiveRecords>
+            {filteredProducts.map((p) => (
+              <article className="admin-record-box" key={p.id}>
+                <div className="admin-record-field" data-label="Product">
                   <div className="table-product">
                     <img
                       src={p.image}
@@ -59,13 +65,13 @@ export default function ProductsPage() {
                       <small>{p.weight}</small>
                     </div>
                   </div>
-                </td>
-                <td>{p.category}</td>
-                <td>{money(p.price)}</td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Category">{p.category}</div>
+                <div className="admin-record-field" data-label="Price">{money(p.price)}</div>
+                <div className="admin-record-field" data-label="Stock">
                   <span className={`stock-indicator ${(p.stock ?? 0) < 5 ? 'low' : ''}`}>{p.stock ?? 0} packs</span>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Visibility">
                   <button
                     disabled={busy}
                     className={`status ${p.available ? 'available' : ''}`}
@@ -73,8 +79,8 @@ export default function ProductsPage() {
                   >
                     {p.available ? 'Available' : 'Hidden'}
                   </button>
-                </td>
-                <td>
+                </div>
+                <div className="admin-record-field" data-label="Action">
                   <div className="order-list-actions">
                     <button
                       className="table-action"
@@ -90,12 +96,12 @@ export default function ProductsPage() {
                       <Trash2 size={15} />
                     </button>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </article>
             ))}
-          </tbody>
-        </table>
-        {!matchedProducts.length && <p className="empty">No products found. Add a favorite to get started.</p>}
+          </ResponsiveRecords>
+        </div>
+        {!filteredProducts.length && <p className="empty">No products found. Add a favorite to get started.</p>}
       </div>
       <p className="table-help">Hide products to remove them from the storefront. Products in hidden categories are also hidden.</p>
     </>

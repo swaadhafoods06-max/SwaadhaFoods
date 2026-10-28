@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowUpRight, Heart, Plus } from 'lucide-react';
+import { ArrowUpRight, Heart, ShoppingCart } from 'lucide-react';
 import { Product } from '@/lib/products';
 import { useCommerce } from './commerce';
 
@@ -30,9 +30,8 @@ export function ProductCard({ product: p }: { product: Product }) {
           >
             <Heart size={17} fill={wished ? 'currentColor' : 'none'} />
           </button>
-          <button className="sw-card-add" disabled={stock < 1} onClick={() => add(p)}>
-            <Plus size={16} />
-            <span>{stock > 0 ? 'Add to cart' : 'Sold out'}</span>
+          <button className="sw-card-add sw-card-cart-icon" aria-label={stock > 0 ? `Add ${p.name} to cart` : `${p.name} sold out`} title={stock > 0 ? "Add to cart" : "Sold out"} disabled={stock < 1} onClick={() => add(p)}>
+            <ShoppingCart size={17} />
           </button>
           <span className="sw-card-glare" aria-hidden="true" />
         </div>
@@ -47,7 +46,6 @@ export function ProductCard({ product: p }: { product: Product }) {
           <h3>
             <Link href={href}>{p.name}</Link>
           </h3>
-          <p>{p.description}</p>
           <div className="sw-card-foot">
             <strong>₹{p.price}</strong>
             <Link href={href} className="sw-card-more">

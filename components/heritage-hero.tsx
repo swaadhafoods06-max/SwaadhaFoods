@@ -84,7 +84,7 @@ export function HeritageHero() {
             className={`sw-hero-slide ${i === current ? 'is-active' : ''} ${i === previous && i !== current ? 'is-leaving' : ''}`}
             aria-hidden={i !== current}
           >
-            <img src={slide.image} alt={i === current ? slide.label || slide.title : ''} fetchPriority={i === 0 ? 'high' : 'low'} />
+            <picture>{slide.mobile_image && <source media="(max-width: 760px)" srcSet={slide.mobile_image} />}<img src={slide.image} alt={i === current ? slide.label || slide.title : ''} fetchPriority={i === 0 ? 'high' : 'low'} /></picture>
           </div>
         ))}
       </div>

@@ -83,6 +83,7 @@ export type Order = {
 };
 
 export type Banner = {
+  mobile_image?: string;
   id: string;
   tag: string;
   title: string;

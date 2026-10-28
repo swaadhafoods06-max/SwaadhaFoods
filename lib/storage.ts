@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from './supabase-admin';
 
 export async function uploadImage(file: File, bucket: 'banners' | 'products' | 'media' = 'products'): Promise<string> {
   if (!supabase) {

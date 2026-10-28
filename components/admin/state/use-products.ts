@@ -1,6 +1,6 @@
 'use client';
 import { FormEvent, useRef, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-admin';
 import { generateSku, isCurrentSku, isGeneratedSku, Product, skuBarcode, withDetails } from '@/lib/products';
 import { generateBarcodeValue, productBarcode } from '../barcode';
 import type { Draft } from '../config';

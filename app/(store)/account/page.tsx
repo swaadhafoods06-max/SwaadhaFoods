@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowUpRight, Check, Download, Heart, LogOut, MessageCircle, Package, ShoppingBag, Truck, X } from 'lucide-react';
+import { ArrowUpRight, Check, Eye, EyeOff, Download, Heart, LogOut, MessageCircle, Package, ShoppingBag, Truck, X } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { money, Order } from '@/lib/admin';
@@ -31,6 +31,7 @@ export default function Account() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword,setShowPassword]=useState(false);
   const [name, setName] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');
@@ -209,12 +210,13 @@ export default function Account() {
                 <div className="sw-input">
                   <input
                     required
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     minLength={8}
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <button type="button" className="sw-password-toggle" aria-label={showPassword?"Hide password":"Show password"} aria-pressed={showPassword} onClick={()=>setShowPassword(v=>!v)}>{showPassword?<EyeOff size={19}/>:<Eye size={19}/>}</button>
                 </div>
               </label>
               <button className="sw-btn is-red is-block" disabled={!supabase || busy}>

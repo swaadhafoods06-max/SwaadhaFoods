@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-admin';
 import { Order } from '@/lib/admin';
 import type { AdminData } from './use-admin-data';
 
