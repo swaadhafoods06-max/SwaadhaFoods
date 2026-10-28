@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Check, Upload, Wand2 } from 'lucide-react';
+import { Check, Upload, Wand2, Minus, Plus } from 'lucide-react';
 import { generateSku, MAX_LABEL_CODE_LENGTH, skuBarcode } from '@/lib/products';
 import { productBarcode } from '../barcode';
 import { Modal } from '../modal';
@@ -27,6 +27,8 @@ function ProductForm() {
   } = useAdmin();
   const draft = productEdit!;
   // New products (and old ones without a SKU) get their SKU from the name until it's typed by hand.
+  const [stockInput,setStockInput]=useState(String(draft.stock??0));
+  function changeStock(value:string){setStockInput(value);setProductEdit(prev=>prev?{...prev,stock:value.trim()===''?undefined:Number(value)}:null)}
   const [skuAuto, setSkuAuto] = useState(!draft.id || !draft.sku?.trim());
   if (!productEdit) return null;
 
@@ -98,14 +100,12 @@ function ProductForm() {
         <div className="form-row">
           <label>
             Available stock (packs)
-            <input
-              required
-              type="number"
-              min={0}
-              step={1}
-              value={productEdit.stock ?? 0}
-              onChange={(e) => setProductEdit({ ...productEdit, stock: Number(e.target.value) })}
-            />
+            <div className="admin-stock-stepper">
+              <button type="button" aria-label="Decrease stock" disabled={busy||Number(stockInput)<=0||!Number.isInteger(Number(stockInput))} onClick={()=>changeStock(String(Math.max(0,Number(stockInput)-1)))}><Minus size={18}/></button>
+              <input required aria-label="Available stock in packs" type="number" inputMode="numeric" min={0} step={1} value={stockInput} disabled={busy} onChange={e=>changeStock(e.target.value)}/>
+              <button type="button" aria-label="Increase stock" disabled={busy||!Number.isInteger(Number(stockInput))} onClick={()=>changeStock(String(Number(stockInput)+1))}><Plus size={18}/></button>
+            </div>
+            <small>Enter the total packs currently in stock, then press Save product.</small>
           </label>
           <label>
             SKU (Item code)

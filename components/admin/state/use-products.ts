@@ -14,7 +14,7 @@ export function useProducts({ products, run }: AdminData) {
   const originalStock = useRef<number | null>(null);
 
   function openProduct(product: Product) {
-    originalStock.current = product.stock ?? 0;
+    originalStock.current = product.stock ?? null;
     setProductEdit(withDetails(product));
   }
 
@@ -43,12 +43,12 @@ export function useProducts({ products, run }: AdminData) {
         values.barcode = generateBarcodeValue(values.sku, products.filter((p) => p.id !== id).map(productBarcode));
       }
       let r = id
-        ? await supabase!.from('products').update(values).eq('id', id).eq('stock', originalStock.current ?? 0).select().single()
+        ? await (originalStock.current === null ? supabase!.from('products').update(values).eq('id', id).is('stock', null) : supabase!.from('products').update(values).eq('id', id).eq('stock', originalStock.current)).select().single()
         : await supabase!.from('products').insert(values).select().single();
       if (r.error && r.error.message?.includes('barcode')) {
         const { barcode: _b, ...fallbackValues } = values;
         r = id
-          ? await supabase!.from('products').update(fallbackValues).eq('id', id).eq('stock', originalStock.current ?? 0).select().single()
+          ? await (originalStock.current === null ? supabase!.from('products').update(fallbackValues).eq('id', id).is('stock', null) : supabase!.from('products').update(fallbackValues).eq('id', id).eq('stock', originalStock.current)).select().single()
           : await supabase!.from('products').insert(fallbackValues).select().single();
       }
       if (r.error) {
