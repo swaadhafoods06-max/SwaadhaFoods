@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpRight, CornerDownLeft, Leaf, MessageCircle, Plus, Search, Sparkles, X } from 'lucide-react';
 import { Category, getCategoryImage } from '@/lib/admin';
-import { Product, whatsapp } from '@/lib/products';
+import { Product } from '@/lib/products';
 import { loadMenu } from '@/lib/storefront';
 import { useCommerce } from './commerce';
 import { FALLBACK_IMAGE } from './product-card';
@@ -13,7 +13,7 @@ import { FALLBACK_IMAGE } from './product-card';
 const pages = [
   { label: 'Our kitchen', href: '/products', words: 'shop menu all products kitchen buy' },
   { label: 'Our story', href: '/our-story', words: 'about family story who we are' },
-  { label: 'Contact us', href: '/contact', words: 'contact phone call whatsapp bulk order wedding festival help' },
+  { label: 'Contact us', href: '/contact', words: 'contact phone call bulk order wedding festival help' },
   { label: 'My bag', href: '/cart', words: 'cart bag checkout order' },
   { label: 'My wishlist', href: '/wishlist', words: 'wishlist saved favourites favorites heart' },
   { label: 'My account', href: '/account', words: 'account profile orders invoice login sign in track' },
@@ -193,10 +193,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
               </span>
               <b>Nothing found for “{query.trim()}”.</b>
               <p>Try another word, or ask our kitchen. We’re happy to help.</p>
-              <a className="sw-btn is-red" href={whatsapp(`Hello Swaadha! I was looking for "${query.trim()}".`)} target="_blank" rel="noreferrer">
-                <MessageCircle size={16} />
-                <span>Ask on WhatsApp</span>
-              </a>
+              <Link className="sw-link" href="/contact">Contact our kitchen</Link>
             </div>
           ) : (
             <div id="sw-search-results" role="listbox" aria-label="Search results">

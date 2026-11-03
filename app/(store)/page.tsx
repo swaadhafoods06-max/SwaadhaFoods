@@ -20,8 +20,8 @@ const vows = [
 
 const steps = [
   { Icon: ShoppingBag, title: 'Find your favorites', text: 'A little sweet, a little spice. Add your homemade favorites to the cart.' },
-  { Icon: CalendarDays, title: 'Made just for you', text: 'Order 6–7 days ahead. Every batch gets the time and care it deserves.' },
-  { Icon: Truck, title: 'Home, delivered', text: 'After dispatch: Bangalore in 24 hours. Outside Bangalore in 4–10 days.' },
+  { Icon: CalendarDays, title: 'Made just for you', text: 'Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).' },
+  { Icon: Truck, title: 'Home, delivered', text: 'Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).' },
   { Icon: Users, title: 'Bring everyone along', text: 'Marriages, festivals and family occasions. Bulk orders for 100+ people.' },
 ];
 

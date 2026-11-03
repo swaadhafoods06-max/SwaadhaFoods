@@ -1,4 +1,5 @@
 'use client';
+import {PickupDetails} from '@/components/pickup-details';
 import {PaymentInstructions} from '@/components/payment-instructions';
 
 import Link from 'next/link';
@@ -18,6 +19,7 @@ import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
 function earliest() {
+  if (new Date() <= new Date('2026-11-07T23:59:59+05:30')) return '2026-11-07';
   const d = new Date();
   d.setDate(d.getDate() + 7);
   return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -198,6 +200,8 @@ export default function Cart() {
     setBusy(true);
     setError('');
     try {
+      if (!/^[6-9][0-9]{9}$/.test(altPhone.trim())) throw new Error('Enter a valid 10-digit alternative mobile number.');
+      if (!/^(bangalore|bengaluru)$/i.test(city.trim())) throw new Error('This Diwali, orders are available within Bangalore only.');
       const latest = await loadMenu();
       setMenu(latest.products);
       if (
@@ -271,6 +275,7 @@ export default function Cart() {
             ? 'Your payment screenshot was received. The kitchen will verify it and confirm preparation and delivery.'
             : 'We could not upload your payment screenshot. Please upload it again below so the kitchen can verify your payment.'}
         </p>
+        <PickupDetails orderId={success} autoOpen/>
         {!proofSent && <PaymentProof orderId={success} />}
         <Link className="sw-btn is-red" href="/account" data-magnetic>
           <span>View my orders &amp; invoice</span>
@@ -417,13 +422,14 @@ export default function Cart() {
                   </label>
                   <label className="sw-field">
                     <span>
-                      Alternative mobile number <small>(optional)</small>
+                      Alternative mobile number <small>(required)</small>
                     </span>
                     <div className="sw-input">
                       <input
                         type="tel"
                         pattern="[6-9][0-9]{9}"
                         title="10-digit Indian mobile number, without +91"
+                        required
                         placeholder="Another number we can reach"
                         autoComplete="off"
                         value={altPhone}
@@ -542,7 +548,7 @@ export default function Cart() {
 
               <div className="sw-cart-note">
                 <Truck size={22} />
-                <p>Prepared in fresh batches with 6–7 days lead time. Bangalore delivery: 24 hrs after dispatch. Outside Bangalore: 4–10 days.</p>
+                <p>Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).</p>
               </div>
             </div>
 
@@ -563,7 +569,7 @@ export default function Cart() {
                   <span>
                     <Truck size={14} /> Shipping charges
                   </span>
-                  <strong>Paid extra at delivery</strong>
+                  <strong>Self pay (Book it yourself for this Diwali)</strong>
                 </div>
                 {appliedCoupon && (
                   <div className="is-discount">
@@ -581,6 +587,7 @@ export default function Cart() {
                   <strong>{money(finalTotal)}</strong>
                 </div>
               </div>
+              <p className="sw-shipping-note">Address and order number will be shared after order is confirmed.</p>
 
               <form className="sw-coupon" onSubmit={applyCoupon}>
                 <div className="sw-coupon-row">
@@ -644,7 +651,7 @@ export default function Cart() {
                 </PaymentInstructions>
               )}
 
-              {!isCheckout ? <Link className="sw-btn is-red is-block" href="/checkout"><span>Continue to checkout</span><ArrowUpRight size={17}/></Link> : user && (
+              {!isCheckout ? <button type="button" className="sw-btn is-red is-block" onClick={() => openLogin('/checkout')}><span>Continue to checkout</span><ArrowUpRight size={17}/></button> : user && (
                 <button
                   form="sw-checkout-form"
                   className="sw-btn is-red is-block is-large"

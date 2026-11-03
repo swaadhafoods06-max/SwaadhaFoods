@@ -233,13 +233,13 @@ export function ProductDetail({ id }: { id: string }) {
               <div>
                 <CalendarDays size={20} />
                 <span>
-                  <b>Freshly made for you</b>Order 6–7 days before you need it.
+                  <b>Freshly made for you</b>Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).
                 </span>
               </div>
               <div>
                 <Truck size={20} />
                 <span>
-                  <b>From our kitchen to your door</b>Bangalore 24 hrs · Outside 4–10 days after dispatch.
+                  <b>From our kitchen to your door</b>Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).
                 </span>
               </div>
             </div>
@@ -272,7 +272,7 @@ export function ProductDetail({ id }: { id: string }) {
             ['Ingredients & allergens', `${p.ingredients || 'Please confirm the ingredients with our kitchen before ordering.'}\n${p.allergens || 'For allergies or dietary requirements, contact our kitchen before placing an order.'}`],
             ['Shelf life & storage', `${p.shelf_life || 'Shelf life: please confirm with our kitchen.'}\n${p.storage || 'Storage instructions: please follow the guidance on your pack or check with our kitchen.'}`],
             ['Pack & product details', `Pack size: ${p.weight}\nProduct code: ${p.sku || p.id}`],
-            ['Preparation & delivery', 'Please order 6–7 days in advance for a freshly prepared batch.\nDelivery after dispatch: Bangalore within 24hrs. Outside Bangalore: 4–10 days.'],
+            ['Preparation & delivery', 'Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).'],
           ].map(([title, body], i) => (
             <details key={title} open={i === 0} data-reveal="up">
               <summary>

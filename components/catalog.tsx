@@ -87,7 +87,7 @@ function CatalogContent({ featured = false }: { featured?: boolean }) {
 
       {/* HOME PAGE (featured): pills only. PRODUCTS PAGE: search only. */}
       <div className={`sw-catalog-tools ${featured ? 'is-featured' : 'shop-search-row'}`}>
-        {!featured&&<div className="sw-shop-notes"><span><Leaf size={15}/> Small batches. Real ingredients.</span><span><CalendarDays size={15}/> Made fresh — order 6–7 days ahead</span></div>}
+        {!featured&&<div className="sw-shop-notes"><span><Leaf size={15}/> Small batches. Real ingredients.</span><span><CalendarDays size={15}/> Prebook now for Diwali · Pickup 7 November · Bangalore only</span></div>}
         {featured && (
           <div className="sw-filter" ref={pills} role="group" aria-label="Filter by category">
             {names.map((c) => (

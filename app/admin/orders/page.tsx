@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowUpRight, CalendarDays, Download, IndianRupee, Search, ShoppingBag } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
-import { money, statuses } from '@/lib/admin';
+import { money, statuses, statusLabels } from '@/lib/admin';
 
 export default function OrdersPage() {
   const [dateFrom, setDateFrom] = useState('');
@@ -78,7 +78,7 @@ export default function OrdersPage() {
         <select aria-label="Filter order status" value={orderStatus} onChange={(e) => setOrderStatus(e.target.value)}>
           <option value="all">All statuses</option>
           {statuses.map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{statusLabels[s]}</option>
           ))}
         </select>
       </div>
@@ -107,7 +107,7 @@ export default function OrdersPage() {
                     onChange={(e) => changeStatus(o, e.target.value)}
                   >
                     {statuses.map((s) => (
-                      <option key={s}>{s}</option>
+                      <option key={s} value={s}>{statusLabels[s]}</option>
                     ))}
                   </select>
                 </div>
@@ -127,7 +127,7 @@ export default function OrdersPage() {
         </div>
         {!visibleOrders.length && <p className="empty">No matching orders.</p>}
       </div>
-      <p className="table-help">Orders placed at checkout appear here. WhatsApp messages do not automatically create an order record.</p>
+      <p className="table-help">Orders placed at checkout appear here.</p>
     </>
   );
 }

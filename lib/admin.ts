@@ -52,7 +52,8 @@ export function generatePassword() {
   chars[2] = '!@#$%&*'[values[2] % 7];
   return chars.join('');
 }
-export const statuses = ['pending', 'confirmed', 'preparing', 'dispatched', 'delivered', 'cancelled'] as const;
+export const statuses = ['confirmed', 'preparing', 'dispatched', 'delivered', 'cancelled', 'pending', 'refunded'] as const;
+export const statusLabels: Record<string, string> = { confirmed: 'Confirmed', preparing: 'Not yet dispatched', dispatched: 'Dispatched', delivered: 'Delivered', cancelled: 'Cancelled', pending: 'Pending', refunded: 'Refunded' };
 
 export type Order = {
   id: string;

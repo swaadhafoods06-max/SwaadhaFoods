@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Leaf } from 'lucide-react';
 import { Catalog } from '@/components/catalog';
 import { PageHero } from '@/components/page-hero';
 import { Seal } from '@/components/motion';
-import { whatsapp } from '@/lib/products';
 
 export const metadata = { title: 'Our kitchen' };
 
@@ -32,10 +32,7 @@ export default function Products() {
             <h3>Something special in mind?</h3>
             <p>Ask us about ingredients, allergens, the current menu, or bulk orders for your next celebration.</p>
           </div>
-          <a className="sw-btn is-gold" href={whatsapp('Hello Swaadha! I have a question about your products.')} target="_blank" rel="noreferrer" data-magnetic>
-            <span>Ask our kitchen</span>
-            <ArrowUpRight size={17} />
-          </a>
+          <Link className="sw-link" href="/contact">Contact our kitchen</Link>
         </div>
       </section>
     </>

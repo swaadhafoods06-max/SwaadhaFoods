@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Leaf, MessageCircle, Phone, Truck } from 'lucide-react';
-import { whatsapp } from '@/lib/products';
 import { useAuthUI } from './auth-dialog';
 import { Lines, Ornament } from './motion';
 
@@ -17,10 +16,7 @@ export function SiteFooter() {
             <span>Explore our kitchen</span>
             <ArrowUpRight size={18} />
           </Link>
-          <a className="sw-btn is-ghost-light" href={whatsapp('Hello Swaadha! I would like to know more about your homemade products.')} target="_blank" rel="noreferrer" data-magnetic>
-            <MessageCircle size={17} />
-            <span>Say hello on WhatsApp</span>
-          </a>
+          
         </div>
       </section>
 
@@ -47,12 +43,11 @@ export function SiteFooter() {
           <Link href="/products?category=Pickles">Pickles</Link>
           <Link href="/wishlist">Your wishlist</Link>
         </div>
-        <div className="sw-footer-col" data-reveal="up">
+        <div className="sw-footer-col sw-footer-contact" data-reveal="up">
           <h3>Talk to us</h3>
-          <a href="tel:+918296295658" className="sw-footer-phone">
+          <a id="kitchen-contact" href="tel:+918296295658" className="sw-footer-phone">
             <Phone size={16} /> +91 82962 95658
           </a>
-          <p>Everyday cravings, special occasions, and bulk orders for gatherings of 100+ people.</p>
         </div>
       </div>
 
@@ -61,7 +56,7 @@ export function SiteFooter() {
           <Leaf size={16} /> Natural ingredients
         </span>
         <span>
-          <CalendarDays size={16} /> Order 6–7 days ahead
+          <CalendarDays size={16} /> Prebook now for Diwali · Pickup 7 November · Bangalore only
         </span>
         <span>
           <Truck size={16} /> Bangalore & across India

@@ -1,23 +1,24 @@
 'use client';
 import Link from 'next/link';
+import {PickupDetails} from '@/components/pickup-details';
 import {PaymentProof} from '@/components/payment-proof';
-import { PhoneAuthForm } from '@/components/phone-auth-form';
+import { useAuthUI } from '@/components/auth-dialog';
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight, Check, Eye, EyeOff, Download, Heart, LogOut, MessageCircle, Package, ShoppingBag, Truck, X } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { money, Order } from '@/lib/admin';
-import { whatsapp } from '@/lib/products';
 import { PageHero } from '@/components/page-hero';
 import { useCommerce } from '@/components/commerce';
 
 // The journey every order goes through, shown as a tracker on each order card.
 const journey = ['pending', 'confirmed', 'preparing', 'dispatched', 'delivered'] as const;
 const journeyLabels: Record<string, string> = {
-  pending: 'Placed',
+  pending: 'Pending',
+  refunded: 'Refunded',
   confirmed: 'Confirmed',
-  preparing: 'Preparing',
+  preparing: 'Not yet dispatched',
   dispatched: 'On its way',
   delivered: 'Delivered',
 };
@@ -27,6 +28,7 @@ const dateLabel = (value: string) =>
 
 export default function Account() {
   const router = useRouter();
+  const { openLogin } = useAuthUI();
   const { cart, wishlist } = useCommerce();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
@@ -39,6 +41,14 @@ export default function Account() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (ready && !user) {
+      openLogin();
+      router.replace('/');
+    }
+  }, [ready, user, router, openLogin]);
+
 
   useEffect(() => {
     if (!supabase) {
@@ -113,7 +123,7 @@ export default function Account() {
 
   const displayName = String(user?.user_metadata?.name || '').trim() || user?.email?.split('@')[0] || '';
   const firstName = displayName.split(' ')[0];
-  const active = orders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length;
+  const active = orders.filter((o) => !['delivered', 'cancelled', 'refunded'].includes(o.status)).length;
   const spent = orders.filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + Number(o.total), 0);
   const bagCount = cart.reduce((n, i) => n + i.quantity, 0);
 
@@ -148,42 +158,7 @@ export default function Account() {
             <span />
           </div>
         ) : !user ? (
-          <div className="sw-account-grid">
-            <div className="sw-account-welcome" data-reveal="up">
-              <div className="sw-grain" />
-              <div className="sw-account-medallion">
-                <img src="/family-logo.png" alt="" />
-              </div>
-              <span className="sw-kicker is-light">The Swaadha family table</span>
-              <h2>
-                A few favorites.
-                <br />
-                <em>A familiar feeling.</em>
-              </h2>
-              <ul>
-                <li>
-                  <span>
-                    <ShoppingBag size={18} />
-                  </span>
-                  Save your bag and check out in a moment
-                </li>
-                <li>
-                  <span>
-                    <Truck size={18} />
-                  </span>
-                  Follow each order from our kitchen to your door
-                </li>
-                <li>
-                  <span>
-                    <Download size={18} />
-                  </span>
-                  Keep every invoice in one place
-                </li>
-              </ul>
-            </div>
-
-            <div className="sw-panel sw-account-form" data-reveal="up"><div className="sw-toggle" data-active={mode==='login'?'login':'register'}><span aria-hidden="true"/><button type="button" aria-pressed={mode==='login'} onClick={()=>setMode('login')}>Sign in</button><button type="button" aria-pressed={mode==='signup'} onClick={()=>setMode('signup')}>Create account</button></div><h3>{mode==='login'?'Lovely to see you again.':'Join the Swaadha table.'}</h3><PhoneAuthForm key={mode} register={mode==='signup'}/><p className="sw-account-staff">Kitchen team member? <Link className="sw-link" href="/admin">Admin sign in <ArrowUpRight size={13}/></Link></p></div>
-          </div>
+          null
         ) : (
           <div className="sw-profile">
             <aside className="sw-profile-card" data-reveal="up">
@@ -219,9 +194,7 @@ export default function Account() {
                 <Link href="/wishlist">
                   <Heart size={17} /> My wishlist <b>{wishlist.length}</b>
                 </Link>
-                <a href={whatsapp('Hello Swaadha! I have a question about my order.')} target="_blank" rel="noreferrer">
-                  <MessageCircle size={17} /> Ask our kitchen <ArrowUpRight size={14} />
-                </a>
+                <Link className="sw-link" href="/contact">Contact our kitchen</Link>
               </nav>
 
               <button className="sw-profile-signout" onClick={() => supabase?.auth.signOut()}>
@@ -312,6 +285,7 @@ export default function Account() {
                           </div>
                         </div>
 
+                        <PickupDetails orderId={o.id}/>
                         <p className="sw-order-address">{[o.address, o.city, o.state, o.pincode].filter(Boolean).join(', ')}</p>
                         {o.awb_code && (
                           <p className="sw-order-address">

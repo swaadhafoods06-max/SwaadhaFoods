@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowUpRight, BarChart3, CalendarDays, Download, Package, ShoppingBag } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
 import { navigation } from '@/components/admin/config';
-import { money, statuses } from '@/lib/admin';
+import { money, statuses, statusLabels } from '@/lib/admin';
 
 /** Shared by the Dashboard and Analytics & reports pages; `tab` decides which extras are shown. */
 export function ReportView({ tab }: { tab: 'dashboard' | 'reports' }) {
@@ -98,7 +98,7 @@ export function ReportView({ tab }: { tab: 'dashboard' | 'reports' }) {
                   const count = report.by_status.find((x) => x.status === s)?.count || 0;
                   return (
                     <div key={s}>
-                      <span className={`status ${s}`}>{s}</span>
+                      <span className={`status ${s}`}>{statusLabels[s]}</span>
                       <div>
                         <i style={{ width: `${report.total_orders ? (count / report.total_orders) * 100 : 0}%` }} />
                       </div>

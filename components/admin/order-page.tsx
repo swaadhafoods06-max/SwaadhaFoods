@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
+import {PickupDetails} from '@/components/pickup-details';
 import { ArrowLeft, BadgeCheck, CircleX, Download, ImageIcon, Mail, MapPin, Package, Phone, ReceiptText } from 'lucide-react';
-import { money, statuses } from '@/lib/admin';
+import { money, statuses, statusLabels } from '@/lib/admin';
 import { useAdmin } from './context';
 import { PaymentProofReview } from './payment-proof-review';
 import { ShippingPanel } from './shipping-panel';
@@ -38,7 +39,7 @@ export function OrderPage({ id }: { id: string }) {
         </Link>
         <div className="order-page-title">
           <h2>Order #{order.id.slice(0, 10).toUpperCase()}</h2>
-          <span className={`status ${order.status}`}>{order.status}</span>
+          <span className={`status ${order.status}`}>{statusLabels[order.status] || order.status}</span>
           <span className={`pay-badge is-${payment}`}>{paymentLabel[payment]}</span>
         </div>
         <p>
@@ -74,6 +75,7 @@ export function OrderPage({ id }: { id: string }) {
           </section>
 
           <section>
+            <PickupDetails orderId={order.id} admin/>
             <h3 className="order-label">Shipping address</h3>
             <div className="order-card order-address">
               <MapPin size={18} />
@@ -169,7 +171,7 @@ export function OrderPage({ id }: { id: string }) {
             >
               {statuses.map((s) => (
                 <option key={s} value={s}>
-                  {s[0].toUpperCase() + s.slice(1)}
+                  {statusLabels[s]}
                 </option>
               ))}
             </select>
