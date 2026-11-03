@@ -146,9 +146,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
               <X size={15} />
             </button>
           )}
-          <kbd className="sw-search-esc" onClick={onClose}>
-            Esc
-          </kbd>
+          <button type="button" className="sw-search-esc" aria-label="Close search" onClick={onClose}><X size={18}/></button>
         </div>
 
         <div className="sw-search-body" ref={list}>
@@ -269,19 +267,6 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
         </div>
 
         <footer className="sw-search-foot">
-          <span>
-            <kbd>↑</kbd>
-            <kbd>↓</kbd> to move
-          </span>
-          <span>
-            <kbd>
-              <CornerDownLeft size={11} />
-            </kbd>{' '}
-            to open
-          </span>
-          <span>
-            <kbd>Esc</kbd> to close
-          </span>
           <Link href="/products" onClick={onClose}>
             Browse the whole kitchen <ArrowUpRight size={13} />
           </Link>

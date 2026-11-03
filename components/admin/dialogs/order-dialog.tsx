@@ -1,4 +1,5 @@
 'use client';
+import {PaymentProofReview} from '../payment-proof-review';
 import { Download } from 'lucide-react';
 import { money } from '@/lib/admin';
 import { Modal } from '../modal';
@@ -12,11 +13,12 @@ export function OrderDialog() {
 
   return (
     <Modal title={`Order #${orderDetail.id.slice(0, 10).toUpperCase()}`} onClose={() => setOrderDetail(null)}>
-      <div className="order-detail">
+      <div className="order-detail"><PaymentProofReview orderId={orderDetail.id}/>
         <span className={`status ${orderDetail.status}`}>{orderDetail.status}</span>
         <h3>{orderDetail.customer_name}</h3>
         <p>
           {orderDetail.phone}
+          {orderDetail.alt_phone && <> · Alt: {orderDetail.alt_phone}</>}
           <br />
           {[orderDetail.address, orderDetail.city, orderDetail.state, orderDetail.pincode].filter(Boolean).join(', ')}
         </p>
@@ -45,7 +47,7 @@ export function OrderDialog() {
           <strong>{money(orderDetail.total)}</strong>
         </div>
         <p className="table-help">
-          Payment: {orderDetail.payment_method || 'COD'} · {orderDetail.payment_status || 'unpaid'}.
+          Payment: {(orderDetail.payment_method === 'COD' || !orderDetail.payment_method ? 'UPI / QR' : orderDetail.payment_method)} · {orderDetail.payment_status || 'unpaid'}.
         </p>
         <button className="button outline" disabled={busy} onClick={() => invoice(orderDetail)}>
           <Download size={16} /> Download invoice PDF

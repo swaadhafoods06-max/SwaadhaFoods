@@ -6,7 +6,7 @@ import { ArrowUpRight, Heart, MessageCircle, Phone, Search, ShoppingBag, UserRou
 import { useAuthUI } from './auth-dialog';
 import { useCommerce } from './commerce';
 import { SiteFooter } from './site-footer';
-import { MotionRoot } from './motion';
+import { Marquee, MotionRoot } from './motion';
 import { SearchDialog } from './search-dialog';
 import { whatsapp } from '@/lib/products';
 
@@ -162,7 +162,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             >
               <Search size={18} strokeWidth={1.8} />
               <span>Search</span>
-              <kbd>{shortcut}</kbd>
+
             </button>
             <Link className="sw-icon-btn sw-wish-btn" href="/wishlist" aria-label={`Wishlist, ${wishlist.length} items`}>
               <Heart size={19} strokeWidth={1.7} />
@@ -202,6 +202,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         </div>
+        <div className="sw-header-ticker"><Marquee items={['Honest ingredients','Lovingly homemade','Fresh small batches','No preservatives','Family recipes','Made in Bangalore','Delivered across India']}/></div>
       </header>
 
       <div className={`sw-menu-backdrop ${open ? 'is-open' : ''}`} onClick={() => setOpen(false)} aria-hidden="true" />

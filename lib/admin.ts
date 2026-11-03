@@ -1,6 +1,6 @@
 import { Product } from './products';
 
-export const tabs = ['dashboard', 'pos', 'categories', 'products', 'banners', 'coupons', 'orders', 'reports', 'team'] as const;
+export const tabs = ['dashboard', 'pos', 'categories', 'products', 'banners', 'coupons', 'orders', 'reports', 'payments', 'team'] as const;
 export type Tab = typeof tabs[number];
 export const tabLabels: Record<Tab, string> = {
   dashboard: 'Dashboard',
@@ -11,6 +11,7 @@ export const tabLabels: Record<Tab, string> = {
   coupons: 'Coupons & offers',
   orders: 'Orders',
   reports: 'Analytics & reports',
+  payments: 'Payments',
   team: 'Sub-admins & access',
 };
 
@@ -58,6 +59,7 @@ export type Order = {
   customer_id: string | null;
   customer_name: string;
   phone: string;
+  alt_phone?: string | null;
   address: string;
   requested_date: string;
   status: string;

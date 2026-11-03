@@ -1,4 +1,5 @@
 'use client';
+import {PaymentInstructions} from '@/components/payment-instructions';
 import { useState } from 'react';
 import { ArrowUpRight, Clock, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { PageHero } from '@/components/page-hero';
@@ -85,6 +86,6 @@ export default function Contact() {
           <small className="sw-hint">This opens WhatsApp with your message. Press send there to reach us.</small>
         </form>
       </section>
-    </>
+    <PaymentInstructions/></>
   );
 }

@@ -6,6 +6,7 @@ import { Search, X, Leaf, CalendarDays } from 'lucide-react';
 import { Product } from '@/lib/products';
 import { Category, getCategoryImage } from '@/lib/admin';
 import { loadMenu } from '@/lib/storefront';
+import { ProductCarousel } from './product-carousel';
 import { ProductCard } from './product-card';
 
 const ALL = 'All favorites';
@@ -59,7 +60,7 @@ function CatalogContent({ featured = false }: { featured?: boolean }) {
     (p) => (category === ALL || p.category === category) && p.name.toLowerCase().includes(query.toLowerCase())
   );
   const shown = featured
-    ? [...filtered].sort((a, b) => Number(b.image.startsWith('/images/products/')) - Number(a.image.startsWith('/images/products/'))).slice(0, 4)
+    ? [...filtered].sort((a, b) => Number(b.image.startsWith('/images/products/')) - Number(a.image.startsWith('/images/products/')))
     : filtered;
 
   return (
@@ -122,6 +123,7 @@ function CatalogContent({ featured = false }: { featured?: boolean }) {
       )}
 
       {/* No data-stagger here: re-mounted items would never get revealed and would vanish */}
+      {featured && !loading ? <ProductCarousel key={category}>{shown.map(p=><ProductCard key={p.id} product={p}/>)}</ProductCarousel> : (
       <div className="sw-grid" key={`${category}-${loading}`}>
         {loading
           ? Array.from({ length: 4 }, (_, i) => (
@@ -132,7 +134,8 @@ function CatalogContent({ featured = false }: { featured?: boolean }) {
               </div>
             ))
           : shown.map((p) => <ProductCard product={p} key={p.id} />)}
-      </div>
+      </div>      )}
+
 
       {!loading && !shown.length && !error && (
         <div className="sw-empty">

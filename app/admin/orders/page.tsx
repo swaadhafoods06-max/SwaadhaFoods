@@ -1,5 +1,6 @@
 'use client';
 import { ResponsiveRecords } from '@/components/admin/responsive-records';
+import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowUpRight, CalendarDays, Download, IndianRupee, Search, ShoppingBag } from 'lucide-react';
 import { useAdmin } from '@/components/admin/context';
@@ -15,7 +16,6 @@ export default function OrdersPage() {
     matchedOrders,
     orderStatus,
     query,
-    setOrderDetail,
     setOrderStatus,
     setQuery,
   } = useAdmin();
@@ -88,12 +88,15 @@ export default function OrdersPage() {
           <ResponsiveRecords>
             {visibleOrders.map((o) => (
               <article className="admin-record-box" key={o.id}>
-                <div className="admin-record-field" data-label="Order / customer">
+                <div className="admin-record-field" data-label="Order">
                   <b>#{o.id.slice(0, 10).toUpperCase()}</b>
-                  <small>{o.customer_name}{o.phone && ` (${o.phone})`}</small>
+                  <small>{new Date(o.created_at).toLocaleDateString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' })}</small>
                   {o.coupon_code && <small style={{ color: 'var(--red)' }}> · Coupon: {o.coupon_code}</small>}
                 </div>
-                <div className="admin-record-field" data-label="Requested date">{o.requested_date}</div>
+                <div className="admin-record-field" data-label="Customer">
+                  <b>{o.customer_name}</b>
+                  {o.phone && <small>{o.phone}</small>}
+                </div>
                 <div className="admin-record-field" data-label="Total">{money(o.total)}</div>
                 <div className="admin-record-field" data-label="Status">
                   <select
@@ -110,9 +113,9 @@ export default function OrdersPage() {
                 </div>
                 <div className="admin-record-field" data-label="Details">
                   <div className="order-list-actions">
-                    <button className="table-action" onClick={() => setOrderDetail(o)}>
+                    <Link className="table-action" href={`/admin/orders/${o.id}`}>
                       View <ArrowUpRight size={15} />
-                    </button>
+                    </Link>
                     <button className="table-action" disabled={busy} aria-label={`Download invoice for ${o.id}`} onClick={() => invoice(o)}>
                       <Download size={14} /> Invoice
                     </button>

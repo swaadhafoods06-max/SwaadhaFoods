@@ -1,4 +1,4 @@
-import { BarChart3, Image as ImageIcon, LayoutDashboard, Package, ShoppingBag, Store, Tags, Ticket, Users } from 'lucide-react';
+import { CreditCard, BarChart3, Image as ImageIcon, LayoutDashboard, Package, ShoppingBag, Store, Tags, Ticket, Users } from 'lucide-react';
 import { Banner, Coupon, Metrics, Tab, tabLabels } from '@/lib/admin';
 import { Product } from '@/lib/products';
 
@@ -12,6 +12,7 @@ export const navigation = [
   { id: 'coupons', label: tabLabels.coupons, icon: Ticket },
   { id: 'orders', label: tabLabels.orders, icon: ShoppingBag },
   { id: 'reports', label: tabLabels.reports, icon: BarChart3 },
+  { id: 'payments', label: tabLabels.payments, icon: CreditCard },
   { id: 'team', label: tabLabels.team, icon: Users },
 ] as const;
 
@@ -25,6 +26,7 @@ export const pageIntros: Record<Tab, string> = {
   coupons: 'Discount codes and promotional offers for your customers.',
   orders: 'From a little craving to a happy delivery.',
   reports: 'A clearer picture of your kitchen, ready to download.',
+  payments: 'Manage your Google Pay or PhonePe payment QR and contact number.',
   team: 'The right tabs for the right people.',
 };
 

@@ -1,5 +1,7 @@
 'use client';
 import Link from 'next/link';
+import {PaymentProof} from '@/components/payment-proof';
+import { PhoneAuthForm } from '@/components/phone-auth-form';
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight, Check, Eye, EyeOff, Download, Heart, LogOut, MessageCircle, Package, ShoppingBag, Truck, X } from 'lucide-react';
@@ -180,59 +182,7 @@ export default function Account() {
               </ul>
             </div>
 
-            <form className="sw-panel sw-form sw-account-form" onSubmit={authenticate} data-reveal="up">
-              <div className="sw-toggle" data-active={mode === 'login' ? 'login' : 'register'}>
-                <span aria-hidden="true" />
-                <button type="button" aria-pressed={mode === 'login'} onClick={() => setMode('login')}>
-                  Sign in
-                </button>
-                <button type="button" aria-pressed={mode === 'signup'} onClick={() => setMode('signup')}>
-                  Create account
-                </button>
-              </div>
-              <h3>{mode === 'login' ? 'Lovely to see you again.' : 'Join the Swaadha table.'}</h3>
-              {mode === 'signup' && (
-                <label className="sw-field">
-                  <span>Your name</span>
-                  <div className="sw-input">
-                    <input required autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} />
-                  </div>
-                </label>
-              )}
-              <label className="sw-field">
-                <span>Email address</span>
-                <div className="sw-input">
-                  <input required type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-              </label>
-              <label className="sw-field">
-                <span>Password</span>
-                <div className="sw-input">
-                  <input
-                    required
-                    type={showPassword ? "text" : "password"}
-                    minLength={8}
-                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button type="button" className="sw-password-toggle" aria-label={showPassword?"Hide password":"Show password"} aria-pressed={showPassword} onClick={()=>setShowPassword(v=>!v)}>{showPassword?<EyeOff size={19}/>:<Eye size={19}/>}</button>
-                </div>
-              </label>
-              <button className="sw-btn is-red is-block" disabled={!supabase || busy}>
-                <span>{busy ? 'Please wait…' : mode === 'login' ? 'Sign in to my account' : 'Create my account'}</span>
-                <ArrowUpRight size={17} />
-              </button>
-              <small className="sw-hint">
-                {mode === 'signup' ? 'Use at least 8 characters. Confirm your email before signing in.' : 'Your cart stays saved in this browser while you sign in.'}
-              </small>
-              <p className="sw-account-staff">
-                Kitchen team member?{' '}
-                <Link className="sw-link" href="/admin">
-                  Admin sign in <ArrowUpRight size={13} />
-                </Link>
-              </p>
-            </form>
+            <div className="sw-panel sw-account-form" data-reveal="up"><div className="sw-toggle" data-active={mode==='login'?'login':'register'}><span aria-hidden="true"/><button type="button" aria-pressed={mode==='login'} onClick={()=>setMode('login')}>Sign in</button><button type="button" aria-pressed={mode==='signup'} onClick={()=>setMode('signup')}>Create account</button></div><h3>{mode==='login'?'Lovely to see you again.':'Join the Swaadha table.'}</h3><PhoneAuthForm key={mode} register={mode==='signup'}/><p className="sw-account-staff">Kitchen team member? <Link className="sw-link" href="/admin">Admin sign in <ArrowUpRight size={13}/></Link></p></div>
           </div>
         ) : (
           <div className="sw-profile">
@@ -353,7 +303,7 @@ export default function Account() {
                           <div>
                             <small>Payment</small>
                             <b>
-                              {o.payment_method || 'Cash on delivery'} · {o.payment_status || 'unpaid'}
+                              {(o.payment_method === 'COD' || !o.payment_method ? 'UPI / QR' : o.payment_method)} · {o.payment_status || 'unpaid'}
                             </b>
                           </div>
                           <div className="is-total">
@@ -369,6 +319,7 @@ export default function Account() {
                           </p>
                         )}
 
+                        {o.status!=='cancelled'&&<details><summary>QR payment &amp; upload screenshot</summary><PaymentProof orderId={o.id}/></details>}
                         <div className="sw-order-links">
                           <button className="sw-chip" disabled={busy} onClick={() => invoice(o)}>
                             <Download size={14} /> Invoice PDF

@@ -4,7 +4,7 @@ import { passwordProblem } from '@/lib/admin';
 
 export const runtime = 'nodejs';
 
-const tabIds = ['dashboard', 'pos', 'categories', 'products', 'banners', 'coupons', 'orders', 'reports'];
+const tabIds = ['dashboard', 'pos', 'categories', 'products', 'banners', 'coupons', 'orders', 'reports', 'payments'];
 
 /**
  * Creates or updates a sub-admin. Owner only.

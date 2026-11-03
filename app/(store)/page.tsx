@@ -27,22 +27,10 @@ const steps = [
 
 export default function Home() {
   return (
-    <>
+    <div className="sw-home-page">
       <HeritageHero />
 
-      <div className="sw-strip" id="after-hero">
-        <Marquee
-          items={[
-            'Honest ingredients',
-            'Lovingly homemade',
-            'Fresh small batches',
-            'No preservatives',
-            'Family recipes',
-            'Made in Bangalore',
-            'Delivered across India',
-          ]}
-        />
-      </div>
+      <div id="after-hero" />
 
       <section className="sw-section sw-band is-gold-band sw-cravings">
         <div className="sw-head is-center">
@@ -215,6 +203,6 @@ export default function Home() {
         </div>
       </section>
       </div>
-    </>
+    </div>
   );
 }

@@ -16,6 +16,13 @@ export function useOrders({ run, setBusy, setError, setNotice }: AdminData) {
     }, 'Order status updated.');
   }
 
+  function changePaymentStatus(order: Order, status: 'unpaid' | 'paid' | 'rejected') {
+    run(async () => {
+      const r = await supabase!.rpc('set_payment_status', { p_id: order.id, p_status: status });
+      if (r.error) throw r.error;
+    }, status === 'paid' ? 'Payment marked as verified.' : status === 'rejected' ? 'Payment marked as rejected.' : 'Payment marked as unpaid.');
+  }
+
   async function invoice(order: Order) {
     setBusy(true);
     setError('');
@@ -30,5 +37,5 @@ export function useOrders({ run, setBusy, setError, setNotice }: AdminData) {
     }
   }
 
-  return { orderDetail, setOrderDetail, changeStatus, invoice };
+  return { orderDetail, setOrderDetail, changeStatus, changePaymentStatus, invoice };
 }

@@ -44,7 +44,7 @@ export function ProductCard({ product: p }: { product: Product }) {
             </span>
           </div>
           <h3>
-            <Link href={href}>{p.name}</Link>
+            <Link href={href} title={p.name}>{p.name}</Link>
           </h3>
           <div className="sw-card-foot">
             <strong>₹{p.price}</strong>

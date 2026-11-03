@@ -1,0 +1,17 @@
+BEGIN;
+CREATE TABLE IF NOT EXISTS public.payment_proofs(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),order_id uuid NOT NULL REFERENCES public.orders(id),customer_id uuid NOT NULL REFERENCES auth.users(id),image_path text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+ALTER TABLE public.payment_proofs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS proof_read ON public.payment_proofs;
+CREATE POLICY proof_read ON public.payment_proofs FOR SELECT TO authenticated USING(customer_id=auth.uid() OR public.has_tab('orders') OR public.has_tab('payments'));
+DROP POLICY IF EXISTS proof_submit ON public.payment_proofs;
+CREATE POLICY proof_submit ON public.payment_proofs FOR INSERT TO authenticated WITH CHECK(customer_id=auth.uid() AND split_part(image_path,'/',1)=auth.uid()::text AND split_part(image_path,'/',2)=order_id::text AND EXISTS(SELECT 1 FROM public.orders o WHERE o.id=order_id AND o.customer_id=auth.uid()));
+GRANT SELECT,INSERT ON public.payment_proofs TO authenticated;
+INSERT INTO storage.buckets(id,name,public,file_size_limit,allowed_mime_types) VALUES('payment-proofs','payment-proofs',false,5242880,ARRAY['image/png','image/jpeg','image/webp']) ON CONFLICT(id) DO NOTHING;
+DROP POLICY IF EXISTS proof_file_insert ON storage.objects;
+CREATE POLICY proof_file_insert ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='payment-proofs' AND (storage.foldername(name))[1]=auth.uid()::text AND EXISTS(SELECT 1 FROM public.orders o WHERE o.id::text=(storage.foldername(name))[2] AND o.customer_id=auth.uid()));
+DROP POLICY IF EXISTS proof_file_read ON storage.objects;
+CREATE POLICY proof_file_read ON storage.objects FOR SELECT TO authenticated USING(bucket_id='payment-proofs' AND ((storage.foldername(name))[1]=auth.uid()::text OR public.has_tab('orders') OR public.has_tab('payments')));
+DROP POLICY IF EXISTS proof_file_cleanup ON storage.objects;
+CREATE POLICY proof_file_cleanup ON storage.objects FOR DELETE TO authenticated USING(bucket_id='payment-proofs' AND (storage.foldername(name))[1]=auth.uid()::text AND NOT EXISTS(SELECT 1 FROM public.payment_proofs p WHERE p.image_path=name));
+COMMIT;
+NOTIFY pgrst,'reload schema';
