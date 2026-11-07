@@ -1,4 +1,5 @@
 'use client';
+import {PickupText} from '@/components/pickup-date';
 import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Leaf, MessageCircle, Phone, Truck } from 'lucide-react';
 import { useAuthUI } from './auth-dialog';
@@ -56,7 +57,7 @@ export function SiteFooter() {
           <Leaf size={16} /> Natural ingredients
         </span>
         <span>
-          <CalendarDays size={16} /> Prebook now for Diwali · Pickup 7 November · Bangalore only
+          <CalendarDays size={16} /> <PickupText text="Prebook now for Diwali · Pickup 7 November · Bangalore only"/>
         </span>
         <span>
           <Truck size={16} /> Bangalore & across India

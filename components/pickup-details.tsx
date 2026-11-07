@@ -1,4 +1,5 @@
 'use client';
+import {PickupText} from '@/components/pickup-date';
 import {useEffect,useState} from 'react';
 import {Download,MapPin} from 'lucide-react';
 import {supabase as storeClient} from '@/lib/supabase';
@@ -6,7 +7,7 @@ import {supabase as adminClient} from '@/lib/supabase-admin';
 import {OrderPopup} from './order-popup';
 import styles from './order-popup.module.css';
 type Pickup={address:string;name:string;orderNumber:string;date:string};
-export function PickupNotice(){return <div className={styles.card}><h3>Prebook now for Diwali</h3><p><b>Place: BANGALORE</b></p><p><b>Pickup date: 7 November</b><br/>Porter charges self-pay. Book it yourself.</p><p>Delivery within Bangalore only.</p><p>Order number and name must be informed during pickup.</p><small>The pickup address is shown only after you place an order.</small></div>}
+export function PickupNotice(){return <div className={styles.card}><h3>Prebook now for Diwali</h3><p><b>Place: BANGALORE</b></p><p><b><PickupText text="Pickup date: 7 November"/></b><br/>Porter charges self-pay. Book it yourself.</p><p>Delivery within Bangalore only.</p><p>Order number and name must be informed during pickup.</p><small>The pickup address is shown only after you place an order.</small></div>}
 export function PickupDetails({orderId,autoOpen=false,admin=false}:{orderId:string;autoOpen?:boolean;admin?:boolean}){
  const [data,setData]=useState<Pickup|null>(null),[error,setError]=useState(''),[open,setOpen]=useState(autoOpen),[attempt,setAttempt]=useState(0);
  useEffect(()=>{

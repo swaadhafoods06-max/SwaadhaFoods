@@ -1,4 +1,5 @@
 'use client';
+import {PickupText} from '@/components/pickup-date';
 import { useState } from 'react';
 import { ArrowUpRight, Clock, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { PageHero } from '@/components/page-hero';
@@ -31,7 +32,7 @@ export default function Contact() {
               <Clock size={20} />
             </span>
             <small>A little planning goes a long way</small>
-            <b>Prebook now for Diwali · Pickup 7 November · Bangalore only</b>
+            <b><PickupText text="Prebook now for Diwali · Pickup 7 November · Bangalore only"/></b>
           </div>
 
         </div>

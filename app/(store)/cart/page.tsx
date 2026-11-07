@@ -1,4 +1,5 @@
 'use client';
+import {PickupText} from '@/components/pickup-date';
 import {PickupDetails} from '@/components/pickup-details';
 import {PaymentInstructions} from '@/components/payment-instructions';
 
@@ -7,6 +8,7 @@ import {usePathname} from 'next/navigation';
 import {PaymentProof, proofFileError, uploadPaymentProof} from '@/components/payment-proof';
 import { FormEvent, useEffect, useState } from 'react';
 import { ArrowUpRight, CalendarDays, Check, ImageUp, Leaf, LoaderCircle, LocateFixed, LockKeyhole, Minus, Plus, ShieldCheck, ShoppingBag, Tag, Trash2, Truck, X } from 'lucide-react';
+import {loadPickupDate} from '@/lib/pickup';
 import { useAuthUI } from '@/components/auth-dialog';
 import { useCommerce } from '@/components/commerce';
 import { Lines } from '@/components/motion';
@@ -18,12 +20,6 @@ import { money } from '@/lib/admin';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
-function earliest() {
-  if (new Date() <= new Date('2026-11-07T23:59:59+05:30')) return '2026-11-07';
-  const d = new Date();
-  d.setDate(d.getDate() + 7);
-  return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-}
 
 export default function Cart() {
   const isCheckout=usePathname()==='/checkout';
@@ -213,6 +209,9 @@ export default function Cart() {
         throw new Error('A product’s availability changed. Please review your cart.');
       }
 
+      const pickupDate = await loadPickupDate();
+      const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Kolkata'});
+      if (pickupDate < today) throw new Error('The pickup date has passed. Please contact the kitchen for the next pickup date.');
       const payload: Record<string, unknown> = {
         p_name: name,
         p_phone: phone,
@@ -220,7 +219,7 @@ export default function Cart() {
         p_city: city,
         p_state: state,
         p_pincode: pin,
-        p_date: earliest(),
+        p_date: pickupDate,
         p_items: cart.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
         p_checkout_key: checkoutKey,
         p_coupon_code: appliedCoupon ? appliedCoupon.code : null,
@@ -548,7 +547,7 @@ export default function Cart() {
 
               <div className="sw-cart-note">
                 <Truck size={22} />
-                <p>Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).</p>
+                <p><PickupText text="Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay)."/></p>
               </div>
             </div>
 

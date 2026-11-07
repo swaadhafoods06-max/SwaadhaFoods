@@ -1,3 +1,4 @@
+import {PickupText} from '@/components/pickup-date';
 import { Fragment } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Heart, Leaf, ShieldCheck, ShoppingBag, Truck, Users } from 'lucide-react';
@@ -148,7 +149,7 @@ export default function Home() {
                 <Icon size={28} strokeWidth={1.3} />
               </div>
               <h3>{title}</h3>
-              <p>{text}</p>
+              <p><PickupText text={text}/></p>
               <span>{note}</span>
             </article>
           ))}
@@ -178,7 +179,7 @@ export default function Home() {
                 <Icon size={24} strokeWidth={1.4} />
               </div>
               <h3>{title}</h3>
-              <p>{text}</p>
+              <p><PickupText text={text}/></p>
             </li>
           ))}
         </ol>

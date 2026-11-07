@@ -1,4 +1,5 @@
 'use client';
+import {PickupText} from '@/components/pickup-date';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -127,7 +128,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <span>
             <Heart size={11} /> A little love from our kitchen to yours
           </span>
-          <span className="sw-announce-mid">Prebook now for Diwali · Pickup 7 November · Bangalore only</span>
+          <span className="sw-announce-mid"><PickupText text="Prebook now for Diwali · Pickup 7 November · Bangalore only"/></span>
           
         </div>
         <div className="sw-header-bar">

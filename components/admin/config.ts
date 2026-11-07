@@ -26,7 +26,7 @@ export const pageIntros: Record<Tab, string> = {
   coupons: 'Discount codes and promotional offers for your customers.',
   orders: 'From a little craving to a happy delivery.',
   reports: 'A clearer picture of your kitchen, ready to download.',
-  payments: 'Manage your Google Pay or PhonePe payment QR and contact number.',
+  payments: 'Manage UPI payments, your checkout QR and the pickup schedule.',
   team: 'The right tabs for the right people.',
 };
 

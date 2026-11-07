@@ -1,4 +1,5 @@
 'use client';
+import {PickupText} from '@/components/pickup-date';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowUpRight, CalendarDays, Check, Share2, Heart, Leaf, Minus, Package, Plus, ShieldCheck, ShoppingBag, Truck, X, ZoomIn } from 'lucide-react';
@@ -233,13 +234,13 @@ export function ProductDetail({ id }: { id: string }) {
               <div>
                 <CalendarDays size={20} />
                 <span>
-                  <b>Freshly made for you</b>Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).
+                  <b>Freshly made for you</b><PickupText text="Prebook now for Diwali. Pickup date: 7 November. Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay)."/>
                 </span>
               </div>
               <div>
                 <Truck size={20} />
                 <span>
-                  <b>From our kitchen to your door</b>Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay).
+                  <b>From our kitchen to your door</b><PickupText text="Delivery within Bangalore only until 7 November. Porter/Dunzo (charges self-pay)."/>
                 </span>
               </div>
             </div>
@@ -280,7 +281,7 @@ export function ProductDetail({ id }: { id: string }) {
                 <Plus size={16} />
               </summary>
               <div>
-                <p>{body}</p>
+                <p><PickupText text={body}/></p>
               </div>
             </details>
           ))}
